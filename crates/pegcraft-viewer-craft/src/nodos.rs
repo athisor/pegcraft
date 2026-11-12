@@ -1,7 +1,7 @@
 // Vista de nodos (solo lectura) del grafo de la escena, como la Node View de Harmony: posiciones del archivo, backdrops con titulo y color,
 // grupos navegables (doble clic) con breadcrumb, cables Bezier con puertos numerados. Patron de camara/tarjetas/cables imitado de
 // materialcraft/crates/ui-egui/src/graph; codigo propio.
-// Datos: trabajo\visor\grafo.json (scripts\grafo_visor.py, motor lector_xstage): px,py = <node pos> del .xstage, backdrops por grupo, cables LITERALES.
+// Datos: trabajo\visor\grafo.json (scripts\grafo_visor.py, lector sightread.lector): px,py = <node pos> del .xstage, backdrops por grupo, cables LITERALES.
 // Si en un grupo las posiciones del archivo estan degeneradas (muchos nodos en el mismo punto, p. ej. escenas generadas por script) se usa el layout
 // automatico por capas (x,y) solo para ese grupo, y se avisa.
 use egui::{epaint::CubicBezierShape, pos2, vec2, Align2, Color32, FontId, Pos2, Rect, Sense, Stroke, StrokeKind, Vec2};

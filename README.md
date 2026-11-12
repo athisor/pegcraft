@@ -35,6 +35,13 @@ pegcraft ver ejemplos/escena_minima/escena.xstage 1 -o salida.png
 `pegcraft ver <escena.xstage> <fotograma> -o salida.png` hornea el fotograma a una carpeta temporal y lo dibuja con el rasterizador CPU. Si falta el binario, dice el
 comando para compilarlo. Dependencias: `numpy` y `Pillow`; extras opcionales: `pip install -e .[compilar]` (safetensors) y `.[medir]` (scipy).
 
+### Plataformas probadas
+
+| Plataforma | Qué se probó |
+|---|---|
+| Windows 10 (x86_64), Python 3.12 | Suites completas, escenas de producción y visor. |
+| Raspberry Pi 400 (Linux aarch64, Debian 13), Python 3.13 | Clon limpio, entorno virtual nuevo y sin variables `PEGCRAFT_*`: `pip install -e .` (~23 s), `cargo build` de `pegcraft-render` (~43 s), `pegcraft ver` sobre la escena de ejemplo (idéntica píxel a píxel a `esperado_f1.png`) y las suites de pegcraft y de `sightread`. |
+
 ## Límites conocidos del lector de dibujos y paletas
 
 - Fuera de alcance: texto, texturas (se reconocen y no se dibujan), registros `tGTI`/`TGRV` y las formas F=4, 5 y 6 (el dibujo da `TvgIlegible` y el horneado omite

@@ -9,9 +9,7 @@ Este documento resume lo que falta para compilar y ejecutar pegcraft en una máq
    La versión del lector entra en la clave del almacén de activos (`compilar/almacen.version_conversor`: hash de `sightread/tvg`, `sightread/plt` y `bake/gradientes.py`).
 2. **Forks `storytold` con `rev` fijo** (`egui`, `winit`, `craft-ui`) en `crates/pegcraft-viewer-craft/Cargo.toml`: dependen de GitHub; si una revisión desaparece, no compila.
    Falta `cargo vendor`. `cargo check --offline` pasó solo con la caché de cargo de la máquina de origen.
-3. **Visor:** `abrir.rs` asume que se ejecuta desde la raíz del repositorio y que `python` está en el PATH. No se ejecutó el visor tras anonimizar rutas.
-   Los comentarios de cabecera de `crates/pegcraft-viewer*/src/nodos.rs` aún nombran el motor del lector anterior (`lector_xstage`); reemplazar por `sightread.lector`.
-4. **`Cargo.lock` de `pegcraft-gpu` y `pegcraft-viewer`** vienen de otro proyecto y conviene regenerarlos. Los crates no comparten workspace, y `pegcraft-viewer` es un spike duplicado.
+3. **Visor:** `abrir.rs` asume que se ejecuta desde la raíz del repositorio y que `python` está en el PATH. No se ejecutó el visor tras anonimizar rutas.4. **`Cargo.lock` de `pegcraft-gpu` y `pegcraft-viewer`** vienen de otro proyecto y conviene regenerarlos. Los crates no comparten workspace, y `pegcraft-viewer` es un spike duplicado.
 5. **No hay escenas de producción de ejemplo.** Las pruebas del horneado usan los casos sintéticos de `sightread/tests/fixtures/lector/casos/`; las pocas que necesitan una escena propia
    (`PEGCRAFT_XSTAGE_PRUEBA`) o los dibujos `.tvg` se omiten solas (149 pruebas, 5 omitidas).
 6. **Configuración de producción que antes iba fija en el código** (ahora por entorno, vacía por omisión): `PEGCRAFT_EXCLUIR` (regex de rutas de nodo que no se dibujan; antes

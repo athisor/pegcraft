@@ -1,4 +1,4 @@
-"""Censo CRUDO de un .xstage (ElementTree, sin lector_xstage): tipos de nodo, atributos de <attrs> con su valor por omision,
+"""Censo CRUDO de un .xstage (ElementTree, sin pasar por sightread.lector): tipos de nodo, atributos de <attrs> con su valor por omision,
 cuantos nodos los llevan, cuantos con valor distinto del default, cuantos ligados a columna; columnas, claves, options/metrics.
 
   python -m pegcraft.planofmt.censo_crudo <xstage> [--json salida.json] [--max N]
