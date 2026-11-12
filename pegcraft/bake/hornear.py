@@ -11,9 +11,9 @@ import time as _time
 from pathlib import Path
 from . import apilado
 from .. import config as _config
-from ..lector import compat as L
+from sightread.lector import compat as L
 from ..compilar import almacen as _alm
-from .. import rutas as _rutas
+from sightread import rutas as _rutas
 
 CAMARAS = {
     "supuesta": {"cx": 960.0, "cy": 540.0, "sx": 60.0, "sy": 45.06},   # SUPUESTO: calibrado en PLANO
@@ -30,12 +30,12 @@ PERSP_ENV = _os.environ.get("PEGCRAFT_PERSP_D")
 
 
 def convertir_tvg(tvg, esc, svg, gradientes=True):
-    """.tvg -> SVG con el lector `pegcraft.tvg` (el lector .xstage no interviene). Con `gradientes` los rellenos Gradient salen como
+    """.tvg -> SVG con el lector `sightread.tvg` (el lector .xstage no interviene). Con `gradientes` los rellenos Gradient salen como
     <linearGradient>/<radialGradient>. Devuelve (error, info): `error` es None si convirtio o el texto del error si no pudo (`TvgIlegible` en formas
     que no lee, p. ej. un .tvg «forma F=6»: el horneado omite SOLO esa pieza y avisa TVG_ILEGIBLE); `info` es el resultado de
     bake/gradientes.convertir o None. Si falla solo el post-proceso de gradientes se reintenta sin el."""
     from . import gradientes as _gr
-    from ..tvg import TvgIlegible
+    from sightread.tvg import TvgIlegible
     info = None
     try:
         try:

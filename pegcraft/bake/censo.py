@@ -34,7 +34,7 @@ def _exposicion(texto, col, f):
 
 
 def censo(xs, f, patron="."):
-    from ..lector import compat as L
+    from sightread.lector import compat as L
     rx = re.compile(patron, re.I)
     g, ev = L.escena(xs), L.evaluador(xs)
     sw = _modo_switch()

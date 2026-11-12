@@ -17,8 +17,8 @@ CLI: python -I -m pegcraft.bake.matriz_causal <xstage> <fotograma> <regex>   (im
 import sys, math, re, os
 sys.dont_write_bytecode = True
 import numpy as np
-from ..lector import compat as L   # lector de escenas del repo (pegcraft/lector): Escena y Evaluador
-from ..lector.resumen import buscar
+from sightread.lector import compat as L   # lector de escenas (paquete sightread/, subtree): Escena y Evaluador
+from sightread.lector.resumen import buscar
 
 # SUPUESTO (indicio debil): +1, K = [[1, tan], [0, 1]]. Unico caso (Ceja-P-P_1, 3,76 grados): cizalla residual ECC -0,117 (+1), -0,141 (0),
 # -0,171 (-1); el IoU no distingue (0,799 / 0,796 / 0,796). 0 = ignorar el sesgo (como Evaluador.nodos, R4).

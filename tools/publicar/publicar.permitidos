@@ -5,8 +5,7 @@ scripts/
 tests/
 docs/
 tools/publicar/
-tools/sintetico/
-tools/coherencia_path3d.py
+sightread/
 README.md
 LICENSE
 LICENSE-MIT

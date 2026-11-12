@@ -1,5 +1,5 @@
 """grafo_visor.py: exporta el grafo de nodos de un .xstage a grafo.json para la vista de nodos de pegcraft-viewer.
-SOLO LECTURA sobre el .xstage (lector del repo: pegcraft.lector). Escribe solo el JSON de salida.
+SOLO LECTURA sobre el .xstage (lector del repo: sightread.lector). Escribe solo el JSON de salida.
 Uso: python -I scripts\\grafo_visor.py <escena.xstage> <salida grafo.json>
 Formato: {escena, raiz, grupos:{ruta_grupo:{nodos:[{id,nombre,tipo,apagado,x,y,entradas:n,salidas:n}], cables:[{de,pd,a,pa}]}}}
  - cables LITERALES del archivo por grupo (puerto de salida pd -> puerto de entrada pa); los grupos se entran con doble clic en el visor.
@@ -12,8 +12,8 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))   # raiz del repo (con -I el directorio del script no entra solo)
-from pegcraft.lector import abrir  # noqa: E402
-from pegcraft.lector.tipos import RAIZ  # noqa: E402
+from sightread.lector import abrir  # noqa: E402
+from sightread.lector.tipos import RAIZ  # noqa: E402
 
 
 def layout(ids, cables):

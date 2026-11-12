@@ -4,11 +4,11 @@ python -m unittest discover -s tests -p test_avisos_efectos.py"""
 import os, sys, unittest
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lector"))   # constructor de escenas sinteticas (A5)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "sightread", "tests", "lector"))   # constructor de escenas sinteticas (A5), en el subtree sightread/
 import numpy as np
 from pegcraft.bake import apilado, matriz_causal as mc
 from pegcraft.compilar import avisos
-from pegcraft.lector import compat as L
+from sightread.lector import compat as L
 from test_evaluar_ayuda import Escenas, cable, modulo, peg, xstage
 
 ESC = Escenas()

@@ -1,9 +1,9 @@
-"""PEG de camara (12-11-2026): bake/matriz_causal.camara_peg. Escenas sinteticas (pegcraft.lector) + copia real de PLANO si existe.
+"""PEG de camara (12-11-2026): bake/matriz_causal.camara_peg. Escenas sinteticas (sightread.lector) + copia real de PLANO si existe.
 python -m unittest discover -s tests -p test_camara_peg.py"""
 import os, sys, glob, unittest
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lector"))   # constructor de escenas sinteticas (A5)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "sightread", "tests", "lector"))   # constructor de escenas sinteticas (A5), en el subtree sightread/
 from pegcraft.bake import matriz_causal as mc
 from pegcraft.compilar import avisos
 from test_evaluar_ayuda import Escenas, cable, modulo, peg, xstage

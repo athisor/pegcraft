@@ -11,15 +11,16 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
-sys.path.insert(0, str(RAIZ / "tools" / "sintetico"))
+sys.path.insert(0, str(RAIZ / "sightread" / "sintetico"))
 EJ = RAIZ / "ejemplos" / "escena_minima"
 _spec = importlib.util.spec_from_file_location("generar_ejemplo", EJ / "generar.py")
 G = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(G)
 
-from pegcraft import config, plt, ver as V
-from pegcraft.lector import abrir
-from pegcraft.tvg import a_svg, decodificar
+from pegcraft import config, ver as V
+from sightread import plt
+from sightread.lector import abrir
+from sightread.tvg import a_svg, decodificar
 
 
 class TestEjemploMinimo(unittest.TestCase):

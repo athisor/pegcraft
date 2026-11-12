@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# El nombre `sightread` esta reservado en PyPI: si algun dia se publica, la distribucion se llama `sightreader`;
+# el paquete que se importa sigue siendo `sightread`.
+name = "sightreader"
+version = "0.1.0"
+description = "Lectores de sala limpia de escenas Harmony (.xstage), dibujos (.tvg) y paletas (.plt), solo con biblioteca estandar"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT OR Apache-2.0"
+license-files = ["LICENSE-MIT", "LICENSE-APACHE"]
+dependencies = []
+
+# La raiz del repo ES el paquete `sightread` (para que `git subtree` lo deje como paquete en pegcraft).
+[tool.setuptools]
+packages = [
+    "sightread",
+    "sightread.lector",
+    "sightread.lector.columnas",
+    "sightread.tvg",
+    "sightread.plt",
+    "sightread.sintetico",
+]
+
+[tool.setuptools.package-dir]
+sightread = "."

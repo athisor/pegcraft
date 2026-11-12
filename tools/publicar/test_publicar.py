@@ -82,7 +82,7 @@ class TestPublicar(unittest.TestCase):
 
 
 XSTAGE_OK = '<?xml version="1.0" encoding="UTF-8"?>\n<project version="2402">\n <module name="Pieza_A"/>\n</project>\n'
-FIXT = "tests/fixtures/lector/"
+FIXT = "sightread/tests/fixtures/lector/"
 
 
 def fixtures(*lineas):
@@ -93,7 +93,7 @@ class TestFixtures(unittest.TestCase):
     def publicar(self, archivos, prohibidos=None, fix=FIXT):
         o = repo(archivos)
         dest = Path(tempfile.mkdtemp()) / "l"
-        args = ["--origen", str(o), "--destino", str(dest), "--permitidos", permitidos("tests/", "docs/"), "--fixtures", fixtures(fix)]
+        args = ["--origen", str(o), "--destino", str(dest), "--permitidos", permitidos("tests/", "docs/", "sightread/"), "--fixtures", fixtures(fix)]
         if prohibidos:
             f = Path(tempfile.mkdtemp()) / "proh.txt"; f.write_text("\n".join(prohibidos), encoding="utf-8"); args += ["--prohibidos", str(f)]
         return P.main(args), dest

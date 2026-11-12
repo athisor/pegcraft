@@ -1,6 +1,6 @@
 """Fotogramas clave de una escena: aquellos donde cambia el conjunto de dibujos expuestos de los READ (ex scripts/explorar.py,
-que tenia el rango 1..115 y la escena PLANO fijos). Solo lectura (pegcraft.lector: Evaluador.nodos)."""
-from .lector import compat as L
+que tenia el rango 1..115 y la escena PLANO fijos). Solo lectura (sightread.lector: Evaluador.nodos)."""
+from sightread.lector import compat as L
 
 
 def keyframes(xstage, desde=1, hasta=None, patron=None):

@@ -19,7 +19,7 @@ VERSION = 1
 def extraer(xs, f, patron="."):
     """{ruta_read: spec} de los READ con algun deformador activo en el fotograma f. Mismo orden de llamadas que bake/hornear.py."""
     from ..bake import deformadores as D, censo as C, matriz_causal as mc
-    from ..lector import compat as L
+    from sightread.lector import compat as L
     xs = str(xs)
     cen = C.censo(xs, f, patron)
     A = mc.aspecto(L.escena(xs))

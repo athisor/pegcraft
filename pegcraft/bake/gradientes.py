@@ -1,6 +1,6 @@
 """Conversion .tvg -> SVG con la paleta de la escena y los rellenos GRADIENTE (Linear/Radial).
 
-Usa los lectores del repositorio: `pegcraft.tvg` (dibujo) y `pegcraft.plt` (paletas). Que se sabe (MEDIDO en una escena de planos con degradados):
+Usa los lectores del repositorio: `sightread.tvg` (dibujo) y `sightread.plt` (paletas). Que se sabe (MEDIDO en una escena de planos con degradados):
 - El color de un relleno es un id de 8 B; en la paleta .plt (declarada) ese id es una fila `Gradient <nombre> 0x<id> Linear|Radial` + paradas
   (posicion 0-100, R G B A).
 - La GEOMETRIA no esta en la paleta: esta en el registro TGCO del trazo (`modelo["tgco"]`, CENSO-12): 6 f64 = matriz afin 2x3 (a b c d e f,
@@ -14,9 +14,9 @@ Los degradados y texturas llegan del lector con rgba=None y `a_svg` no los dibuj
 import sys
 from pathlib import Path
 
-from .. import plt as _plt
-from .. import rutas as _rutas
-from ..tvg import a_svg, decodificar as _decodificar
+from sightread import plt as _plt
+from sightread import rutas as _rutas
+from sightread.tvg import a_svg, decodificar as _decodificar
 
 
 def paradas_escena(escena, elemento=None):

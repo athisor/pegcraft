@@ -32,11 +32,13 @@ def sha_archivo(p):
 
 
 def version_conversor():
-    """Hash del codigo del lector .tvg (pegcraft/tvg/*.py), del lector .plt (pegcraft/plt/*.py) y del post-proceso de gradientes
+    """Hash del codigo del lector .tvg (sightread/tvg/*.py), del lector .plt (sightread/plt/*.py) y del post-proceso de gradientes
     (cambia el codigo => cambia toda la clave)."""
     if "ver" not in _memo:
+        import sightread
+        sr = Path(sightread.__file__).resolve().parent
         h = hashlib.sha256(ESQUEMA.encode())
-        fs = sorted((PAQUETE / "tvg").glob("*.py")) + sorted((PAQUETE / "plt").glob("*.py")) + [PAQUETE / "bake" / "gradientes.py"]
+        fs = sorted((sr / "tvg").glob("*.py")) + sorted((sr / "plt").glob("*.py")) + [PAQUETE / "bake" / "gradientes.py"]
         for f in fs:
             if f.is_file():
                 h.update(f.parent.name.encode()); h.update(f.name.encode()); h.update(f.read_bytes())

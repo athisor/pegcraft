@@ -17,7 +17,7 @@ API:     orden_apilado(escena, fotograma) -> dict(orden=[{id, z, recorrido, puer
 """
 import sys, json, os
 sys.dont_write_bytecode = True
-from ..lector import compat as L   # lector de escenas del repo (pegcraft/lector): Escena (grafo) y Evaluador
+from sightread.lector import compat as L   # lector de escenas (paquete sightread/, subtree): Escena (grafo) y Evaluador
 
 from ..config import Z_EXCEPCIONES as EXCEPCIONES_Z   # nombres de piezas con Z conocida (PEGCRAFT_Z_EXCEPCIONES; solo informativo)
 

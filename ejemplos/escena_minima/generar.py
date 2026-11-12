@@ -3,15 +3,15 @@
     python -I ejemplos/escena_minima/generar.py            escribe escena.xstage, elements/, palette-library/ y PALETTE_LIST
     python -I ejemplos/escena_minima/generar.py --verificar  regenera en memoria y compara con lo que hay en disco
 
-Los .tvg los escribe `tools/sintetico/tvg_minimo.py` (sin CERT ni firma: no son archivos de Harmony); el .xstage lo escribe
-`tools/sintetico/generador.py`. Todo es determinista.
+Los .tvg los escribe `sightread/sintetico/tvg_minimo.py` (sin CERT ni firma: no son archivos de Harmony); el .xstage lo escribe
+`sightread/sintetico/generador.py`. Todo es determinista.
 """
 import json
 import sys
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
-sys.path.insert(0, str(AQUI.parents[1] / "tools" / "sintetico"))
+sys.path.insert(0, str(AQUI.parents[1] / "sightread" / "sintetico"))
 import generador  # noqa: E402
 import tvg_minimo as w  # noqa: E402
 

@@ -1,4 +1,4 @@
-"""Camino de horneado SIN el conversor .tvg, sobre los casos sinteticos de tests/fixtures/lector/casos (A7): apilado, matriz causal,
+"""Camino de horneado SIN el conversor .tvg, sobre los casos sinteticos de sightread/tests/fixtures/lector/casos (A7): apilado, matriz causal,
 censo de deformadores, fotogramas clave y un `hornear` completo con el conversor sustituido por un SVG vacio.
 
 Comprueba contra los valores esperados de cada caso (esperado.json): Z, cadena de transformadores y matriz (cuando no tiene traslacion).
@@ -10,11 +10,11 @@ from unittest import mock
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lector"))   # constructor de escenas sinteticas (A5)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "sightread", "tests", "lector"))   # constructor de escenas sinteticas (A5), en el subtree sightread/
 from pegcraft.bake import apilado, censo, hornear as H, matriz_causal as mc
 from pegcraft.compilar import almacen
 from pegcraft.keyframes import keyframes
-from pegcraft.lector import compat as L
+from sightread.lector import compat as L
 from test_evaluar_ayuda import Escenas, cable, grupo, modulo, peg, read, xstage
 
 ESC = Escenas()
@@ -23,7 +23,7 @@ ESC = Escenas()
 def tearDownModule():
     ESC.cerrar()
 
-CASOS = Path(__file__).resolve().parent / "fixtures" / "lector" / "casos"
+CASOS = Path(__file__).resolve().parent.parent / "sightread" / "tests" / "fixtures" / "lector" / "casos"
 NOMBRES = sorted(p.name[:-len(".xstage")] for p in CASOS.glob("*.xstage"))
 TOL = 1e-6
 # c09 f=11: el esperado de A7 ("constante entre dos llaves iguales") discrepa de la regla de velocity del lector; se mide en Harmony aparte.

@@ -1,0 +1,7 @@
+* text=auto eol=lf
+# Fixtures sinteticos: se comparan byte a byte con lo que genera sintetico/, sin conversion de fin de linea.
+tests/fixtures/** -text
+tests/lector/columnas/fixtures/** -text
+*.tvg -text
+*.xstage -text
+*.plt -text

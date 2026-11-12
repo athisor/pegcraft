@@ -6,7 +6,7 @@ from . import almacen, plano
 
 def rango(spec, xs):
     if spec == "todos":
-        from ..lector import compat
+        from sightread.lector import compat
         n = compat.n_fotogramas(xs)
         if not n:
             raise SystemExit(f"no pude leer el numero de fotogramas (scene@nbframes) de {xs}")
