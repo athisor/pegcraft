@@ -1,53 +1,50 @@
-"""PEG de camara (12-11-2026): bake/matriz_causal.camara_peg. Sintetico (X y E falsos) + copia real de PLANO si existe.
+"""PEG de camara (12-11-2026): bake/matriz_causal.camara_peg. Escenas sinteticas (pegcraft.lector) + copia real de PLANO si existe.
 python -m unittest discover -s tests -p test_camara_peg.py"""
 import os, sys, glob, unittest
-from types import SimpleNamespace
-from unittest import mock
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pegcraft.bake import matriz_causal as mc, apilado
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lector"))   # constructor de escenas sinteticas (A5)
+from pegcraft.bake import matriz_causal as mc
 from pegcraft.compilar import avisos
+from test_evaluar_ayuda import Escenas, cable, modulo, peg, xstage
+
+ESC = Escenas()
+
+
+def tearDownModule():
+    ESC.cerrar()
+
+
+def _a(tag, v):
+    return f'<{tag} val="{v}" />'
 
 
 class _XFalso:
-    """Imita las funciones de xstage/api.py que usa camara_peg."""
-    def __init__(self, nombre_peg="Top/Cam-Raro", fila=None, offset_z=12.0, cuelga=(), tipo_fuente="PEG", offset_x=0.0, offset_y=0.0):
+    """Describe una escena minima: [Padre ->] PEG de camara (o COMPOSITE) -> CAMERA, con canales del PEG y offset de la CAMERA."""
+    def __init__(self, nombre_peg="Cam-Raro", fila=None, offset_z=12.0, cuelga=(), tipo_fuente="PEG", offset_x=0.0, offset_y=0.0):
         self.n, self.fila, self.oz, self.cuelga, self.tf = nombre_peg, fila or {}, offset_z, cuelga, tipo_fuente
         self.ox, self.oy = offset_x, offset_y
 
-    def nodo_buscar(self, xs, **kw):
-        return {"nodos": [{"ruta": "Top/Camera", "tipo": "CAMERA", "entradas": [f"0<-{self.n}:0"]}]}
-
-    def nodo_vecinos(self, xs, nodo, **kw):
-        if nodo == "Top/Camera":
-            return {"vecinos": [{"ruta": self.n, "tipo": self.tf}]}
-        return {"vecinos": [{"ruta": c, "tipo": "PEG"} for c in self.cuelga]}
-
-    def peg_volcar(self, xs, peg, desde, hasta, max):
-        b = {"f": desde, "posicion.x": 0.0, "posicion.y": 0.0, "posicion.z": 0.0, "escala.x": 1.0, "escala.y": 1.0, "rotacion": 0.0}
-        b.update(self.fila)
-        return {"filas": [b]}
-
-    def nodo_atributo(self, xs, nodo, atributo, fotograma):
-        if atributo == "offset.x":
-            return {"valor_en_fotograma": str(self.ox)}
-        if atributo == "offset.y":
-            return {"valor_en_fotograma": str(self.oy)}
-        if self.oz is None:
-            raise SystemExit("sin offset.z")
-        return {"valor_en_fotograma": str(self.oz)}
-
-
-def _mods_falso(uy="24"):
-    doc = SimpleNamespace(root=SimpleNamespace(find=lambda p: SimpleNamespace(get=lambda k: {"numberOfUnitsY": uy, "unitAspectRatioX": "4", "unitAspectRatioY": "3"}.get(k))))
-    E = SimpleNamespace(abrir=lambda x: doc, xstage_de=lambda x: x)
-    return lambda: (None, E)
+    def xml(self, uy="24"):
+        f = self.fila
+        nodos, cables = [], ""
+        if self.tf == "PEG":
+            nodos.append(peg(self.n, pos=(f.get("posicion.x", 0.0), f.get("posicion.y", 0.0), f.get("posicion.z", 0.0)), rot=f.get("rotacion", 0.0),
+                             esc=(f.get("escala.x", 1.0), f.get("escala.y", 1.0))))
+            for c in self.cuelga:
+                nodos.append(peg(c)); cables += cable(c, self.n)
+        else:
+            nodos.append(modulo(self.tf, self.n))
+        z = _a("z", self.oz) if self.oz is not None else ""
+        nodos.append(modulo("CAMERA", "Camera", f'<offset><separate val="true" />{_a("x", self.ox)}{_a("y", self.oy)}{z}</offset>'))
+        cables += cable(self.n, "Camera")
+        return xstage(nodos, cables, metricas=(4, 3, 24, int(uy), 12))
 
 
 def _llamar(x, uy="24", **kw):
     av = []
-    with mock.patch.object(apilado, "X", x), mock.patch.object(mc, "_mods", _mods_falso(uy)):
-        return mc.camara_peg("falso.xstage", 1, av, **kw), av
+    ruta = str(ESC.abrir_xml(x.xml(uy)).ruta)
+    return mc.camara_peg(ruta, 1, av, **kw), av
 
 
 class TestCamaraPegSintetico(unittest.TestCase):
@@ -59,7 +56,7 @@ class TestCamaraPegSintetico(unittest.TestCase):
         self.assertIsNone(r); self.assertEqual(av, [])
 
     def test_por_tipo_no_por_nombre(self):
-        r, av = _llamar(_XFalso("Top/Otro-Nombre", {"posicion.z": -8.0, "posicion.x": -6.0, "posicion.y": 1.0}))
+        r, av = _llamar(_XFalso("Otro-Nombre", {"posicion.z": -8.0, "posicion.x": -6.0, "posicion.y": 1.0}))
         self.assertEqual(r["ruta"], "Top/Otro-Nombre"); self.assertEqual((r["x"], r["y"], r["z"]), (-6.0, 1.0, -8.0))
         self.assertAlmostEqual(r["d"], 12.0); self.assertAlmostEqual(r["A"], 4 / 3); self.assertEqual(av, [])
 
@@ -101,7 +98,7 @@ class TestCamaraPegSintetico(unittest.TestCase):
         self.assertEqual(r["d"], 10.0); self.assertTrue(any("sin offset.z" in a for a in av))
 
     def test_cuelga_de_otro_peg_avisa(self):
-        r, av = _llamar(_XFalso(fila={"escala.x": 0.9, "escala.y": 0.9}, cuelga=("Top/Padre",)))
+        r, av = _llamar(_XFalso(fila={"escala.x": 0.9, "escala.y": 0.9}, cuelga=("Padre",)))
         self.assertTrue(any("cuelga" in a for a in av))
 
     def test_apagado_por_entorno(self):

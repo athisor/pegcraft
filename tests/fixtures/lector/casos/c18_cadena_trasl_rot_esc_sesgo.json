@@ -1,0 +1,23 @@
+{
+ "nombre": "c18_cadena_trasl_rot_esc_sesgo",
+ "descripcion": "Cadena Peg_Abuelo (posicion 2, 1; pivote 1, -1; rotacion 25; escala 1,5 x 0,8; sesgo 15) -> Peg_Nieto (posicion -1, 0,5; rotacion -40; escala 0,7 x 1,6; sesgo -10) -> READ con offset propio.",
+ "fotogramas": 12,
+ "evaluar": [1],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-12", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_Abuelo", "attrs": {"position/x": 2, "position/y": 1, "pivot/x": 1, "pivot/y": -1, "rotation/anglez": 25, "scale/x": 1.5, "scale/y": 0.8, "skew": 15}},
+  {"tipo": "PEG", "nombre": "Peg_Nieto", "attrs": {"position/x": -1, "position/y": 0.5, "rotation/anglez": -40, "scale/x": 0.7, "scale/y": 1.6, "skew": -10}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}, "offset/x": 0.5, "offset/y": -0.25}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_Abuelo", "destino": "Peg_Nieto"},
+  {"origen": "Peg_Nieto", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

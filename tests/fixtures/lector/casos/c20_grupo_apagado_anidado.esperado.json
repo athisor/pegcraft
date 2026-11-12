@@ -1,0 +1,667 @@
+{
+ "caso": "c20_grupo_apagado_anidado",
+ "version_formato": 1,
+ "descripcion": "Cuatro READ (escala 0,25, cada uno en su casilla): control fuera de grupos; Grupo_Ext_Off (apagado) con Grupo_Int_On dentro; Grupo_Ext_On con Grupo_Int_Off (apagado) dentro; Grupo_Ext_On2 con Grupo_Int_On2 (ambos encendidos).",
+ "origen": "paridad",
+ "origen_por_bloque": {
+  "grafo": "regla",
+  "atributos": "regla",
+  "evaluacion": "paridad",
+  "medicion": "harmony"
+ },
+ "medicion": {
+  "estado": "medido",
+  "origen": "harmony",
+  "version_harmony": "24.0.2 build 23443",
+  "fecha": "2026-11-12",
+  "metodo": "medido en Harmony 24 (-batch) sobre una copia de una escena vacia creada por el usuario, a la que se le inserto el contenido del caso editando su XML; la firma de la escena del usuario se conserva sin tocar. Lectura: getMatrix por nodo y atributo DRAWING; render solo en los casos de apagado",
+  "metricas": [
+   4,
+   3,
+   24,
+   24,
+   12
+  ],
+  "K": [
+   0.1111111111111111,
+   0.08333333333333333,
+   0.2222222222222222
+  ],
+  "error_lectura": {
+   "matriz_campos_xy": 5.1e-06,
+   "z_campos": 6.866455078125e-05,
+   "nota": "xy: error de lectura de getMatrix en espacio de matriz; z cuantizada a 1/65536 en espacio de matriz"
+  },
+  "unidades": "matriz y z en campos: F = D^-1 M D con D = diag(KX,KY,KZ,1); matriz = [[a,b,tx],[c,d,ty]]",
+  "nodos": {
+   "Top/Dibujo_Control": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        0.25,
+        0.0,
+        -6.0
+       ],
+       [
+        0.0,
+        0.25,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     }
+    }
+   },
+   "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        0.25,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        0.25,
+        4.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": true,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     }
+    }
+   },
+   "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        0.25,
+        0.0,
+        6.0
+       ],
+       [
+        0.0,
+        0.25,
+        4.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": true,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     }
+    }
+   },
+   "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        0.25,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        0.25,
+        -6.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     }
+    }
+   }
+  },
+  "se_dibuja": {
+   "render": "1920x1080, 60 px/campo en x y 45 en y, cuadro 1",
+   "manchas_tal_cual": 2,
+   "manchas_todo_encendido": 4,
+   "nodos": {
+    "Top/Dibujo_Control": {
+     "se_dibuja": true,
+     "con_todo_encendido": true,
+     "apagado_efectivo_esperado": false,
+     "coincide_con_apagado_efectivo": true
+    },
+    "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A": {
+     "se_dibuja": false,
+     "con_todo_encendido": true,
+     "apagado_efectivo_esperado": true,
+     "coincide_con_apagado_efectivo": true
+    },
+    "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B": {
+     "se_dibuja": false,
+     "con_todo_encendido": true,
+     "apagado_efectivo_esperado": true,
+     "coincide_con_apagado_efectivo": true
+    },
+    "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C": {
+     "se_dibuja": true,
+     "con_todo_encendido": true,
+     "apagado_efectivo_esperado": false,
+     "coincide_con_apagado_efectivo": true
+    }
+   }
+  },
+  "reinterpretacion_al_guardar": {
+   "nodos_antes": 18,
+   "nodos_despues": 18,
+   "cables_antes": 11,
+   "cables_despues": 11,
+   "diferencias": []
+  },
+  "discrepancias_con_regla_paridad": [],
+  "notas": [
+   "Un grupo apagado apaga a todo lo que lleva dentro aunque haya un grupo encendido en medio (Grupo_Ext_Off > Grupo_Int_On: no se dibuja); un grupo apagado dentro de uno encendido tambien apaga (Grupo_Ext_On > Grupo_Int_Off: no se dibuja); dos encendidos dibujan. Concuerda con apagado_efectivo = marca propia o de algun grupo ascendente."
+  ]
+ },
+ "escena": {
+  "fotogramas": 12,
+  "fps": 24
+ },
+ "nodos": [
+  {
+   "ruta": "Top/Dibujo_Control",
+   "tipo": "READ",
+   "nombre": "Dibujo_Control",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_Ext_Off",
+   "tipo": "GROUP",
+   "nombre": "Grupo_Ext_Off",
+   "padre": null,
+   "apagado": true,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Grupo_Ext_Off/Multi-Port-Out",
+   "tipo": "MULTIPORT_OUT",
+   "nombre": "Multi-Port-Out",
+   "padre": "Grupo_Ext_Off",
+   "apagado": false,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Grupo_Ext_Off/Grupo_Int_On",
+   "tipo": "GROUP",
+   "nombre": "Grupo_Int_On",
+   "padre": "Grupo_Ext_Off",
+   "apagado": false,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Grupo_Ext_Off/Grupo_Int_On/Multi-Port-Out",
+   "tipo": "MULTIPORT_OUT",
+   "nombre": "Multi-Port-Out",
+   "padre": "Grupo_Ext_Off/Grupo_Int_On",
+   "apagado": false,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A",
+   "tipo": "READ",
+   "nombre": "Dibujo_A",
+   "padre": "Grupo_Ext_Off/Grupo_Int_On",
+   "apagado": false,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On",
+   "tipo": "GROUP",
+   "nombre": "Grupo_Ext_On",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On/Multi-Port-Out",
+   "tipo": "MULTIPORT_OUT",
+   "nombre": "Multi-Port-Out",
+   "padre": "Grupo_Ext_On",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On/Grupo_Int_Off",
+   "tipo": "GROUP",
+   "nombre": "Grupo_Int_Off",
+   "padre": "Grupo_Ext_On",
+   "apagado": true,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On/Grupo_Int_Off/Multi-Port-Out",
+   "tipo": "MULTIPORT_OUT",
+   "nombre": "Multi-Port-Out",
+   "padre": "Grupo_Ext_On/Grupo_Int_Off",
+   "apagado": false,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B",
+   "tipo": "READ",
+   "nombre": "Dibujo_B",
+   "padre": "Grupo_Ext_On/Grupo_Int_Off",
+   "apagado": false,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On2",
+   "tipo": "GROUP",
+   "nombre": "Grupo_Ext_On2",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On2/Multi-Port-Out",
+   "tipo": "MULTIPORT_OUT",
+   "nombre": "Multi-Port-Out",
+   "padre": "Grupo_Ext_On2",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On2/Grupo_Int_On2",
+   "tipo": "GROUP",
+   "nombre": "Grupo_Int_On2",
+   "padre": "Grupo_Ext_On2",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On2/Grupo_Int_On2/Multi-Port-Out",
+   "tipo": "MULTIPORT_OUT",
+   "nombre": "Multi-Port-Out",
+   "padre": "Grupo_Ext_On2/Grupo_Int_On2",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C",
+   "tipo": "READ",
+   "nombre": "Dibujo_C",
+   "padre": "Grupo_Ext_On2/Grupo_Int_On2",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Composite",
+   "tipo": "COMPOSITE",
+   "nombre": "Composite",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pantalla",
+   "tipo": "DISPLAY",
+   "nombre": "Pantalla",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  }
+ ],
+ "cables_literales": [
+  [
+   "Top/Grupo_Ext_Off/Grupo_Int_On",
+   "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A",
+   0,
+   "Top/Grupo_Ext_Off/Grupo_Int_On/Multi-Port-Out",
+   0
+  ],
+  [
+   "Top/Grupo_Ext_Off",
+   "Top/Grupo_Ext_Off/Grupo_Int_On",
+   0,
+   "Top/Grupo_Ext_Off/Multi-Port-Out",
+   0
+  ],
+  [
+   "Top/Grupo_Ext_On/Grupo_Int_Off",
+   "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B",
+   0,
+   "Top/Grupo_Ext_On/Grupo_Int_Off/Multi-Port-Out",
+   0
+  ],
+  [
+   "Top/Grupo_Ext_On",
+   "Top/Grupo_Ext_On/Grupo_Int_Off",
+   0,
+   "Top/Grupo_Ext_On/Multi-Port-Out",
+   0
+  ],
+  [
+   "Top/Grupo_Ext_On2/Grupo_Int_On2",
+   "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C",
+   0,
+   "Top/Grupo_Ext_On2/Grupo_Int_On2/Multi-Port-Out",
+   0
+  ],
+  [
+   "Top/Grupo_Ext_On2",
+   "Top/Grupo_Ext_On2/Grupo_Int_On2",
+   0,
+   "Top/Grupo_Ext_On2/Multi-Port-Out",
+   0
+  ],
+  [
+   "Top",
+   "Top/Dibujo_Control",
+   0,
+   "Top/Composite",
+   0
+  ],
+  [
+   "Top",
+   "Top/Grupo_Ext_Off",
+   0,
+   "Top/Composite",
+   1
+  ],
+  [
+   "Top",
+   "Top/Grupo_Ext_On",
+   0,
+   "Top/Composite",
+   2
+  ],
+  [
+   "Top",
+   "Top/Grupo_Ext_On2",
+   0,
+   "Top/Composite",
+   3
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Pantalla",
+   0
+  ]
+ ],
+ "fuentes": {
+  "Top/Grupo_Ext_Off/Multi-Port-Out": {
+   "0": [
+    [
+     "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A",
+     0
+    ]
+   ]
+  },
+  "Top/Grupo_Ext_Off/Grupo_Int_On/Multi-Port-Out": {
+   "0": [
+    [
+     "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A",
+     0
+    ]
+   ]
+  },
+  "Top/Grupo_Ext_On/Multi-Port-Out": {
+   "0": [
+    [
+     "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B",
+     0
+    ]
+   ]
+  },
+  "Top/Grupo_Ext_On/Grupo_Int_Off/Multi-Port-Out": {
+   "0": [
+    [
+     "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B",
+     0
+    ]
+   ]
+  },
+  "Top/Grupo_Ext_On2/Multi-Port-Out": {
+   "0": [
+    [
+     "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C",
+     0
+    ]
+   ]
+  },
+  "Top/Grupo_Ext_On2/Grupo_Int_On2/Multi-Port-Out": {
+   "0": [
+    [
+     "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C",
+     0
+    ]
+   ]
+  },
+  "Top/Composite": {
+   "0": [
+    [
+     "Top/Dibujo_Control",
+     0
+    ]
+   ],
+   "1": [
+    [
+     "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A",
+     0
+    ]
+   ],
+   "2": [
+    [
+     "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B",
+     0
+    ]
+   ],
+   "3": [
+    [
+     "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C",
+     0
+    ]
+   ]
+  },
+  "Top/Pantalla": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  }
+ },
+ "puertos_composite": {
+  "Top/Composite": [
+   0,
+   1,
+   2,
+   3
+  ]
+ },
+ "atributos": {},
+ "evaluacion": {
+  "1": {
+   "Top/Dibujo_Control": {
+    "tipo": "READ",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Dibujo_Control"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 0.25,
+     "escala.y": 0.25,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": -6.0,
+     "offset.y": 0.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": null,
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A": {
+    "tipo": "READ",
+    "padre": "Grupo_Ext_Off/Grupo_Int_On",
+    "apagado": false,
+    "apagado_efectivo": true,
+    "cadena": [
+     "Top/Grupo_Ext_Off/Grupo_Int_On/Dibujo_A"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 0.25,
+     "escala.y": 0.25,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 4.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": null,
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B": {
+    "tipo": "READ",
+    "padre": "Grupo_Ext_On/Grupo_Int_Off",
+    "apagado": false,
+    "apagado_efectivo": true,
+    "cadena": [
+     "Top/Grupo_Ext_On/Grupo_Int_Off/Dibujo_B"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 0.25,
+     "escala.y": 0.25,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 6.0,
+     "offset.y": 4.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": null,
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C": {
+    "tipo": "READ",
+    "padre": "Grupo_Ext_On2/Grupo_Int_On2",
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Grupo_Ext_On2/Grupo_Int_On2/Dibujo_C"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 0.25,
+     "escala.y": 0.25,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": -6.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": null,
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  }
+ }
+}

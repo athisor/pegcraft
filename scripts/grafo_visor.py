@@ -1,5 +1,5 @@
 """grafo_visor.py: exporta el grafo de nodos de un .xstage a grafo.json para la vista de nodos de pegcraft-viewer.
-SOLO LECTURA sobre el .xstage (motor de lector_xstage, por sys.path desde PEGCRAFT_XSTAGE_DIR). Escribe solo el JSON de salida.
+SOLO LECTURA sobre el .xstage (lector del repo: pegcraft.lector). Escribe solo el JSON de salida.
 Uso: python -I scripts\\grafo_visor.py <escena.xstage> <salida grafo.json>
 Formato: {escena, raiz, grupos:{ruta_grupo:{nodos:[{id,nombre,tipo,apagado,x,y,entradas:n,salidas:n}], cables:[{de,pd,a,pa}]}}}
  - cables LITERALES del archivo por grupo (puerto de salida pd -> puerto de entrada pa); los grupos se entran con doble clic en el visor.
@@ -11,9 +11,9 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.dont_write_bytecode = True
-import os
-sys.path.insert(0, os.environ.get("PEGCRAFT_XSTAGE_DIR", ""))   # carpeta que contiene el paquete lector_xstage (ver LIMPIEZA_PENDIENTE.md)
-from lector_xstage.core.scene_graph import SceneGraph  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))   # raiz del repo (con -I el directorio del script no entra solo)
+from pegcraft.lector import abrir  # noqa: E402
+from pegcraft.lector.tipos import RAIZ  # noqa: E402
 
 
 def layout(ids, cables):
@@ -67,28 +67,28 @@ def layout(ids, cables):
 
 def main():
     xs, out = Path(sys.argv[1]), Path(sys.argv[2])
-    g = SceneGraph.from_xstage(xs)
+    g = abrir(xs)
     por_grupo = defaultdict(lambda: {"nodos": [], "cables": []})
     nin, nout = defaultdict(int), defaultdict(int)
-    for e in g.edges:
-        nout[e.src] = max(nout[e.src], e.src_port + 1)
-        nin[e.dst] = max(nin[e.dst], e.dst_port + 1)
-    for p, n in g.nodes.items():
+    for e in g.cables:
+        nout[e.origen] = max(nout[e.origen], e.puerto_origen + 1)
+        nin[e.destino] = max(nin[e.destino], e.puerto_destino + 1)
+    for p, n in g.nodos.items():
         # px,py = posicion que Harmony guarda en el .xstage (coordenadas de la vista nodal; y crece hacia abajo)
-        por_grupo[n.group]["nodos"].append({"id": p, "nombre": n.name, "tipo": n.type, "apagado": bool(n.disabled), "entradas": nin[p], "salidas": nout[p],
+        por_grupo[n.grupo]["nodos"].append({"id": p, "nombre": n.nombre, "tipo": n.tipo, "apagado": bool(n.apagado), "entradas": nin[p], "salidas": nout[p],
                                             "px": n.pos[0], "py": n.pos[1]})
     for bd in g.backdrops:
-        por_grupo[bd.group].setdefault("backdrops", []).append({"titulo": bd.title, "color": bd.color, "rect": list(bd.rect), "nodos": list(bd.nodes)})
-    for e in g.edges:
-        por_grupo[e.group]["cables"].append({"de": e.src, "pd": e.src_port, "a": e.dst, "pa": e.dst_port})
+        por_grupo[bd.grupo].setdefault("backdrops", []).append({"titulo": bd.titulo, "color": bd.color, "rect": list(bd.rect), "nodos": list(bd.nodos)})
+    for e in g.cables:
+        por_grupo[e.grupo]["cables"].append({"de": e.origen, "pd": e.puerto_origen, "a": e.destino, "pa": e.puerto_destino})
     for gr, d in por_grupo.items():
         pos = layout([n["id"] for n in d["nodos"]], d["cables"])
         for n in d["nodos"]:
             n["x"], n["y"] = pos[n["id"]]
-    salida = {"escena": str(xs), "raiz": g.root_path, "total_nodos": len(g.nodes), "total_cables": len(g.edges), "grupos": por_grupo}
+    salida = {"escena": str(xs), "raiz": RAIZ, "total_nodos": len(g.nodos), "total_cables": len(g.cables), "grupos": por_grupo}
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(salida, ensure_ascii=False), encoding="utf-8")
-    print(f"{len(g.nodes)} nodos, {len(g.edges)} cables, {len(por_grupo)} grupos -> {out}")
+    print(f"{len(g.nodos)} nodos, {len(g.cables)} cables, {len(por_grupo)} grupos -> {out}")
     for gr, d in sorted(por_grupo.items(), key=lambda kv: -len(kv[1]["nodos"]))[:8]:
         print(f"  {gr}: {len(d['nodos'])} nodos, {len(d['cables'])} cables")
 

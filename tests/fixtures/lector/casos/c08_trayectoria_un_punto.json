@@ -1,0 +1,22 @@
+{
+ "nombre": "c08_trayectoria_un_punto",
+ "descripcion": "Trayectoria 3D con un solo punto (constante); provoca IndexError en lectores ingenuos.",
+ "fotogramas": 12,
+ "evaluar": [1, 6, 12],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-12", "dibujo": "1"}]},
+  {"nombre": "Col_Tray", "tipo": 2, "puntos": [{"v": [0.5, 0.25, 0.1], "t": 1}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_A", "attrs": {"position/attr3dpath": {"col": "Col_Tray"}}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_A", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

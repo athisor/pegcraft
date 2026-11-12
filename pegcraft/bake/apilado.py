@@ -3,44 +3,52 @@
 Reglas ( §2-§6):
 - El recorrido parte del composite que alimenta al WRITE/DISPLAY (o Top/Composite) y va AGUAS ARRIBA,
   puerto por puerto en orden creciente (0 = atras), expandiendo cada composite anidado en su lugar
-  (profundidad primero). Los grupos se cruzan por Multi-Port (SceneGraph.input_cables).
+  (profundidad primero). Los grupos se cruzan por Multi-Port (Escena.fuentes).
 - Manda el numero de puerto, no el orden del archivo; un hueco de puertos no cambia nada.
-- Con Z distinta gana la Z (Z de la cadena de escena_evaluar = Z acumulada); con Z igual manda el puerto.
+- Con Z distinta gana la Z (Z de la cadena de Evaluador.nodos = Z acumulada); con Z igual manda el puerto.
   Se implementa como orden estable por (z, indice del recorrido).
 - DeformationCompositeModule no apila (compone cadenas de deformacion): se salta con aviso.
 - CUTTER: puerto 0 = imagen (se apila en el lugar del cutter), puerto 1 = matte (NO se dibuja; queda como
   `recorte` de las piezas del puerto 0). El rasterizador aun no recorta: se avisa.
 - READ que el evaluador expone pero el recorrido no alcanza: no llegan al render (se excluyen con aviso).
 
-Uso CLI: python -I apilado.py <xstage> <fotograma> [--json salida.json]
+Uso CLI: python -I -m pegcraft.bake.apilado <xstage> <fotograma> [--json salida.json]
 API:     orden_apilado(escena, fotograma) -> dict(orden=[{id, z, recorrido, puertos, razon, ...}], excluidas, mattes, avisos)
 """
-import sys, json, os, importlib.util
+import sys, json, os
 sys.dont_write_bytecode = True
-# Fachada del lector de escenas (dependencia externa, ver LIMPIEZA_PENDIENTE.md): ruta de su api.py en PEGCRAFT_XSTAGE_API.
-_API = os.environ.get("PEGCRAFT_XSTAGE_API", "")
-if _API and os.path.isfile(_API):
-    sys.path.insert(0, os.path.dirname(os.path.dirname(_API))); sys.path.insert(0, os.path.dirname(_API))
-    _spec = importlib.util.spec_from_file_location("xapi", _API)
-    X = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(X)
-else:
-    X = None   # sin el lector externo el horneado no funciona; las funciones puras de este modulo si se importan
+from ..lector import compat as L   # lector de escenas del repo (pegcraft/lector): Escena (grafo) y Evaluador
 
-EXCEPCIONES_Z = ("ANIMATIC", "TIMECODE", "FONDO_PEG")   # Z conocida (doc §6, criterio del estudio)
+from ..config import Z_EXCEPCIONES as EXCEPCIONES_Z   # nombres de piezas con Z conocida (PEGCRAFT_Z_EXCEPCIONES; solo informativo)
+
+norm = L.norm
+
+# Dos Z que difieren en menos de TOL_Z son la MISMA Z (empate: manda el puerto). Las Z son sumas de ~12 canales de PEG; el horneado
+# comparaba Z redondeadas a una rejilla de ~2e-6 y el lector da la suma exacta: entre ambos hay hasta ~3e-6 por valor, o sea ~6e-6 entre dos Z (A6-01). Sin tolerancia ese
+# ruido desordena piezas empatadas (medido en los 36 horneados del banco: 15 difieren con 0, 4 con 4e-6, 2 con 5e-6..8e-6, 3 con 1e-5, 32 con 1e-4:
+# hay Z reales separadas por 1e-5, asi que no se puede subir mas). PEGCRAFT_TOL_Z=0 vuelve a la comparacion exacta.
+TOL_Z = float(os.environ.get("PEGCRAFT_TOL_Z", "6e-6"))
 
 
-def norm(r):
-    r = r.lstrip("/")
-    return r if r.startswith("Top/") or r == "Top" else "Top/" + r
+def grupos_z(zs, tol=None):
+    """{z: indice de grupo}: los valores distintos, ordenados, se agrupan mientras cada uno este a <= `tol` del anterior."""
+    tol = TOL_Z if tol is None else tol
+    g, prev, out = -1, None, {}
+    for z in sorted(set(zs)):
+        if prev is None or z - prev > tol:
+            g += 1
+        out[z] = g
+        prev = z
+    return out
 
 
 def _raiz(g, avisos):
-    for p, n in g.nodes.items():
-        if n.type in ("WRITE", "DISPLAY") and not n.disabled:
-            s = g.resolve_source(p, 0)
-            if s and g.nodes[s[0]].type == "COMPOSITE":
+    for p, n in g.nodos.items():
+        if n.tipo in ("WRITE", "DISPLAY") and not n.apagado:
+            s = g.fuente(p, 0)
+            if s and g.nodos[s[0]].tipo == "COMPOSITE":
                 return s[0]
-    if "Top/Composite" in g.nodes:
+    if "Top/Composite" in g.nodos:
         avisos.append("sin WRITE/DISPLAY con composite: se usa Top/Composite")
         return "Top/Composite"
     raise SystemExit("no se encontro el composite raiz")
@@ -53,10 +61,10 @@ def recorrer(g, raiz):
     def visitar(nodo, puertos, recorte, modo, prof):
         if prof > 200:
             avisos.append(f"recorrido demasiado profundo en {nodo}"); return
-        n = g.nodes[nodo]
-        t = n.type
+        n = g.nodos[nodo]
+        t = n.tipo
         if t == "READ":
-            if n.disabled:
+            if n.apagado:
                 return
             if modo == "matte":
                 mattes.append({"id": nodo, "puertos": list(puertos)}); return
@@ -64,33 +72,33 @@ def recorrer(g, raiz):
                 avisos.append(f"READ alcanzado por dos caminos (se dibuja dos veces): {nodo}")
             vistos.add(nodo)
             hojas.append({"id": nodo, "puertos": list(puertos), "recorte": list(recorte)}); return
-        if n.disabled and t == "COMPOSITE":
+        if n.apagado and t == "COMPOSITE":
             avisos.append(f"composite apagado, se omite su contenido: {nodo}"); return
         if t == "DeformationCompositeModule":
             avisos.append(f"DeformationCompositeModule en el camino de imagen (no apila; se salta): {nodo}"); return
         if t == "PEG" or t.endswith("Module") or t in ("StaticConstraint",):
             return   # transformaciones y deformadores: no son imagen
         if t == "COMPOSITE":
-            for p in g.composite_ports(nodo):
-                for s, _sp in g.input_cables(nodo, p.port):
-                    visitar(s, puertos + (p.port,), recorte, modo, prof + 1)
+            for p in g.puertos_composite(nodo):
+                for s, _sp in g.fuentes(nodo, p):
+                    visitar(s, puertos + (p,), recorte, modo, prof + 1)
             return
         if t == "CUTTER" or "MATTE" in t.upper():
             antes = len(mattes)
-            for s, _sp in g.input_cables(nodo, 1):
+            for s, _sp in g.fuentes(nodo, 1):
                 visitar(s, puertos, (), "matte", prof + 1)
-            inv = g.attr_val(nodo, "inverted")
+            inv = g.atributo(nodo, "inverted")
             rec = recorte + ({"nodo": nodo, "tipo": t, "invertido": inv,
                               "mattes": [m["id"] for m in mattes[antes:]]},)
-            for s, _sp in g.input_cables(nodo, 0):
+            for s, _sp in g.fuentes(nodo, 0):
                 visitar(s, puertos, rec, modo, prof + 1)
             return
         # intermedios (LINE_ART, COLOR_ART, AutoPatchModule, OVERLAY...): la imagen sigue por sus entradas
-        ins = sorted(g.inputs(nodo))
+        ins = sorted(g.entradas(nodo))
         if len(ins) > 1:
             avisos.append(f"{t} con {len(ins)} entradas tratadas como imagen en orden de puerto: {nodo}")
         for ip in ins:
-            for s, _sp in g.input_cables(nodo, ip):
+            for s, _sp in g.fuentes(nodo, ip):
                 visitar(s, puertos, recorte, modo, prof + 1)
 
     visitar(raiz, (), (), "imagen", 0)
@@ -99,12 +107,12 @@ def recorrer(g, raiz):
 
 def orden_apilado(escena, fotograma, evaluados=None):
     avisos = []
-    xs, g = X._grafo(escena, avisos)
+    g = L.escena(escena); xs = g.ruta
     raiz = _raiz(g, avisos)
     hojas, mattes, av = recorrer(g, raiz)
     avisos += av
     if evaluados is None:
-        evaluados = X.escena_evaluar(str(xs), fotograma=fotograma, tipos=["READ"], solo_con_dibujo=True, max=2000)["nodos"]
+        evaluados = L.nodos_evaluados(xs, fotograma)
     ev = {norm(n["ruta"]): n for n in evaluados}
     matte_ids = {m["id"] for m in mattes}
     filas = []
@@ -113,7 +121,8 @@ def orden_apilado(escena, fotograma, evaluados=None):
         if e is None or e["apagado"]:
             continue   # sin dibujo expuesto en este fotograma o apagado por un grupo
         filas.append({**h, "recorrido": i, "z": float(e["z"])})
-    final = sorted(filas, key=lambda r: (r["z"], r["recorrido"]))
+    zk = grupos_z([r["z"] for r in filas])
+    final = sorted(filas, key=lambda r: (zk[r["z"]], r["recorrido"]))
     pos = {r["id"]: k for k, r in enumerate(final)}
     # razon: inversiones contra el orden por puerto (pares donde la Z decide)
     for r in final:
@@ -162,11 +171,11 @@ def recorrer_conectores(g, raiz, exp=None, efectos=None):
 
     def capas_sel(nodo):
         m = {"underlay": "readUnderlay", "colour": "readColourart", "line": "readLineart", "overlay": "readOverlay"}
-        return {c for c, a in m.items() if SI(g.attr_val(nodo, a))}
+        return {c for c, a in m.items() if SI(g.atributo(nodo, a))}
 
     def visitar(nodo, puertos, recorte, capas, modo, dest, prof, bloque, glow=False):
-        n = g.nodes[nodo]; t = n.type
-        des = n.disabled or nodo in apagar or (t == "CUTTER" and exp.get("sin_cutter"))   # apagado = deja pasar su entrada 0
+        n = g.nodos[nodo]; t = n.tipo
+        des = n.apagado or nodo in apagar or (t == "CUTTER" and exp.get("sin_cutter"))   # apagado = deja pasar su entrada 0
         if t == "READ":
             if des or not capas:
                 return
@@ -181,52 +190,52 @@ def recorrer_conectores(g, raiz, exp=None, efectos=None):
             if des:
                 avisos.append(f"composite apagado: {nodo}"); return
             b = bloque
-            if b is None and g.attr_val(nodo, "compositeMode") != "compositePassthrough":
+            if b is None and g.atributo(nodo, "compositeMode") != "compositePassthrough":
                 b = nodo   # bloque = el composite no passthrough mas externo
-            for p in g.composite_ports(nodo):
-                for s, _ in g.input_cables(nodo, p.port):
-                    visitar(s, puertos + (p.port,), recorte, capas, modo, dest, prof + 1, b, glow)
+            for p in g.puertos_composite(nodo):
+                for s, _ in g.fuentes(nodo, p):
+                    visitar(s, puertos + (p,), recorte, capas, modo, dest, prof + 1, b, glow)
             return
         if t == "AutoPatchModule" and not exp.get("sin_autopatch"):
             # SUPUESTO (coherente con el experimento E3): el matte de un Auto-Patch es el arte de COLOR del dibujo
-            for s, _ in g.input_cables(nodo, 0):
+            for s, _ in g.fuentes(nodo, 0):
                 visitar(s, puertos, recorte, set(capas) & {"colour"} if not des else capas, modo, dest, prof + 1, bloque, glow)
             return
         if t == "DeformationCompositeModule" or t == "PEG" or t.endswith("Module") and t != "BLEND_MODE_MODULE" or t in ("StaticConstraint", "MasterController"):
             return
         if t == "GAUSSIANBLUR-PLUGIN" and modo == "matte" and not des:
             try:
-                b = float(g.attr_val(nodo, "blurriness"))
+                b = float(g.atributo(nodo, "blurriness"))
             except (TypeError, ValueError):
                 b = 0.0
             blur_pila.append(b)
             try:
-                for ip in sorted(g.inputs(nodo)):
-                    for s, _ in g.input_cables(nodo, ip):
+                for ip in sorted(g.entradas(nodo)):
+                    for s, _ in g.fuentes(nodo, ip):
                         visitar(s, puertos, recorte, capas, modo, dest, prof + 1, bloque, glow)
             finally:
                 blur_pila.pop()
             return
         if t == "VISIBILITY":
-            if not SI(g.attr_val(nodo, "softrender")) and not des and not exp.get("sin_visibility"):
+            if not SI(g.atributo(nodo, "softrender")) and not des and not exp.get("sin_visibility"):
                 cortados.append(nodo); return
         if t == "CUTTER":
             ms = []
             if not des and not exp.get("sin_cutter"):
-                for s, _ in g.input_cables(nodo, 1):
+                for s, _ in g.fuentes(nodo, 1):
                     visitar(s, (), (), set(TODAS), "matte", ms, prof + 1, None)
             rec = recorte
             if ms:
-                rec = recorte + ({"nodo": nodo, "invertido": SI(g.attr_val(nodo, "inverted")),
+                rec = recorte + ({"nodo": nodo, "invertido": SI(g.atributo(nodo, "inverted")),
                                   "mattes": [{"id": m["id"], "capas": m["capas"], **({"blur": m["blur"]} if m.get("blur") else {})} for m in ms]},)
             elif not des:
                 avisos.append(f"cutter sin matte (pasa la imagen): {nodo}")
-            for s, _ in g.input_cables(nodo, 0):
+            for s, _ in g.fuentes(nodo, 0):
                 visitar(s, puertos, rec, capas, modo, dest, prof + 1, bloque, glow)
             return
         if efectos is not None and not des and t in ("BLEND_MODE_MODULE", "GLOW"):
-            efectos.setdefault(nodo, {"tipo": t, "modo": g.attr_val(nodo, "blendMode"), "radio": g.attr_val(nodo, "radius"),
-                                      "multiplicativo": SI(g.attr_val(nodo, "multiplicative"))})
+            efectos.setdefault(nodo, {"tipo": t, "modo": g.atributo(nodo, "blendMode"), "radio": g.atributo(nodo, "radius"),
+                                      "multiplicativo": SI(g.atributo(nodo, "multiplicative"))})
         c2 = capas
         if not des and not exp.get("sin_capas"):
             if t in FILTRO:
@@ -237,9 +246,9 @@ def recorrer_conectores(g, raiz, exp=None, efectos=None):
             avisos.append(f"{t} tratado como transparente (efecto no aplicado): {nodo}")
         # GLOW con multiplicative=false y no apagado: lo que le llega por arriba se SUMA (Harmony). Con multiplicative=true no se marca.
         g2 = glow
-        if t == "GLOW" and not des and not SI(g.attr_val(nodo, "multiplicative")):
+        if t == "GLOW" and not des and not SI(g.atributo(nodo, "multiplicative")):
             try:
-                g2 = float(g.attr_val(nodo, "colourGain"))
+                g2 = float(g.atributo(nodo, "colourGain"))
             except (TypeError, ValueError):
                 g2 = 1.0
             g2 = min(g2, 1.0)   # MEDIDO PLANO: con colourGain 2 el ajuste empeora (0,899 con 1 -> 0,82 con 2); queda abierto por que
@@ -248,8 +257,8 @@ def recorrer_conectores(g, raiz, exp=None, efectos=None):
                 g2 = float(_mp[nodo.split("/")[-1]])
             elif os.environ.get("PEGCRAFT_GLOW_GAIN"):   # experimento: fuerza la ganancia
                 g2 = float(os.environ["PEGCRAFT_GLOW_GAIN"])
-        for ip in sorted(g.inputs(nodo)):
-            for s, _ in g.input_cables(nodo, ip):
+        for ip in sorted(g.entradas(nodo)):
+            for s, _ in g.fuentes(nodo, ip):
                 visitar(s, puertos, recorte, c2, modo, dest, prof + 1, bloque, g2)
 
     visitar(raiz, (), (), set(TODAS), "imagen", hojas, 0, None)
@@ -284,13 +293,13 @@ def avisos_efectos(efectos):
 
 def orden_apilado_conectores(escena, fotograma, evaluados=None, exp=None, z_modo="global"):
     avisos = []
-    xs, g = X._grafo(escena, avisos)
+    g = L.escena(escena); xs = g.ruta
     raiz = _raiz(g, avisos)
     efectos = {}
     hojas, av, cortados = recorrer_conectores(g, raiz, exp, efectos)
     avisos += av
     if evaluados is None:
-        evaluados = X.escena_evaluar(str(xs), fotograma=fotograma, tipos=["READ"], solo_con_dibujo=True, max=2000)["nodos"]
+        evaluados = L.nodos_evaluados(xs, fotograma)
     ev = {norm(n["ruta"]): n for n in evaluados}
     filas = []
     for i, h in enumerate(hojas):
@@ -298,18 +307,19 @@ def orden_apilado_conectores(escena, fotograma, evaluados=None, exp=None, z_modo
         if e is None or e["apagado"]:
             continue
         filas.append({**h, "recorrido": i, "z": float(e["z"])})
+    zk = grupos_z([r["z"] for r in filas])   # la Z se compara con tolerancia (TOL_Z): empate = manda el puerto
     if z_modo == "bitmap":
         zb = {}
         for r in filas:
             if r["bloque"]:
-                zb[r["bloque"]] = r["z"]   # la ultima hoja del bloque = puerto mas alto (LEFTMOST, SUPUESTO)
+                zb[r["bloque"]] = zk[r["z"]]   # la ultima hoja del bloque = puerto mas alto (LEFTMOST, SUPUESTO)
         prim = {}
         for r in filas:
             if r["bloque"]:
                 prim.setdefault(r["bloque"], r["recorrido"])
-        clave = lambda r: (zb[r["bloque"]], prim[r["bloque"]], r["z"], r["recorrido"]) if r["bloque"] else (r["z"], r["recorrido"], 0, 0)
+        clave = lambda r: (zb[r["bloque"]], prim[r["bloque"]], zk[r["z"]], r["recorrido"]) if r["bloque"] else (zk[r["z"]], r["recorrido"], 0, 0)
     else:
-        clave = lambda r: (r["z"], r["recorrido"])
+        clave = lambda r: (zk[r["z"]], r["recorrido"])
     final = sorted(filas, key=clave)
     for k, r in enumerate(final):
         r["orden"] = k; r["razon"] = "puerto+z"

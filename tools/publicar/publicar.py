@@ -1,7 +1,7 @@
 """publicar: lleva a un repo LIMPIO solo lo commiteado y permitido del repo de desarrollo, tras un escaner anti-fuga.
 
 Uso:  python tools/publicar/publicar.py --destino <carpeta> [--origen <repo>] [--permitidos publicar.permitidos]
-                                         [--prohibidos prohibidos.local.txt] [--autor "nombre <correo>"] [--mensaje TXT] [--empujar]
+                                         [--prohibidos prohibidos.local.txt] [--fixtures fixtures.permitidos] [--autor "nombre <correo>"] [--mensaje TXT] [--empujar]
 
 Reglas:
   1. Parte de `git archive HEAD` del origen: el trabajo sin commitear nunca entra.
@@ -11,6 +11,10 @@ Reglas:
      Si algo falla, se detiene con codigo 2 SIN tocar el destino. El informe da archivo:linea:categoria, nunca el texto hallado.
   4. Escribe en el destino (repo git propio, con historial propio) y hace un commit nuevo con autor neutro.
   5. `--empujar` hace `git push` al remoto del destino; sin el flag no se sube nada.
+
+  6. Los .xstage estan bloqueados por extension, salvo los de las rutas de `fixtures.permitidos` (escenas SINTETICAS de pruebas):
+     ahi deben pesar menos de 200 KB, no llevar `checksumValidation`, rutas absolutas ni ningun nombre de prohibidos.local.txt.
+     Ver tools/publicar/prohibidos.local.txt.ejemplo.
 
 El archivo de nombres prohibidos NO debe versionarse (contiene justo lo que se quiere ocultar): usar `prohibidos.local.txt`.
 """
@@ -29,8 +33,10 @@ PATRONES = {
 EXT_BLOQUEADAS = {".xstage", ".tvg", ".safetensors", ".sqlite", ".db", ".zip", ".rar", ".7z", ".exe", ".dll", ".mp4", ".mov", ".wav",
                   ".psd", ".plt", ".sboard", ".sbpz", ".env", ".pem", ".key", ".pfx"}
 EXT_TEXTO = {".py", ".rs", ".toml", ".md", ".txt", ".json", ".yml", ".yaml", ".ps1", ".cmd", ".sh", ".cfg", ".ini", ".html", ".css", ".js",
-             ".svg", ".lock", ".gitignore", ".permitidos", ""}
+             ".svg", ".lock", ".gitignore", ".permitidos", ".ejemplo", ".xml", ".gitattributes", ""}
+EXT_FIXTURE = {".xstage"}                     # unica extension bloqueada que puede admitirse, solo en las rutas de fixtures.permitidos
 MAX_BYTES = 1_500_000
+MAX_FIXTURE = 200_000
 IGNORAR_LINEA = "publicar: permitir"          # comentario en la linea para excepciones revisadas a mano
 
 
@@ -39,7 +45,10 @@ def leer_lista(ruta):
     for l in Path(ruta).read_text(encoding="utf-8").splitlines():
         l = l.split("#", 1)[0].strip()
         if l:
-            out.append(l.replace("\\", "/").lstrip("./"))
+            l = l.replace("\\", "/")
+            while l.startswith("./"):        # solo el prefijo "./": lstrip(".") se comia el punto de ".gitignore"
+                l = l[2:]
+            out.append(l.lstrip("/"))
     return out
 
 
@@ -68,21 +77,26 @@ def exportar_head(origen, tmp):
     return dst
 
 
-def escanear(raiz, rutas, prohibidos=()):
-    """-> lista de (ruta relativa, linea|0, categoria). No devuelve el texto encontrado."""
+def escanear(raiz, rutas, prohibidos=(), fixtures=()):
+    """-> lista de (ruta relativa, linea|0, categoria). No devuelve el texto encontrado.
+
+    `fixtures` = prefijos (formato de publicar.permitidos) donde se admite un .xstage SINTETICO; ahi se exige ademas:
+    menos de MAX_FIXTURE bytes, sin `checksumValidation` y (como todo texto) sin rutas absolutas ni nombres prohibidos.
+    Un .xstage fuera de esos prefijos sigue bloqueado por extension."""
     hallazgos = []
     nombres = [re.compile(p, re.I) for p in prohibidos]
     for rel in rutas:
         p = Path(raiz) / rel
         ext = p.suffix.lower()
-        if ext in EXT_BLOQUEADAS:
+        es_fixture = ext in EXT_FIXTURE and permitido(rel, fixtures)
+        if ext in EXT_BLOQUEADAS and not es_fixture:
             hallazgos.append((rel, 0, "extension_bloqueada")); continue
-        if p.stat().st_size > MAX_BYTES:
-            hallazgos.append((rel, 0, "archivo_grande")); continue
+        if p.stat().st_size > (MAX_FIXTURE if es_fixture else MAX_BYTES):
+            hallazgos.append((rel, 0, "fixture_grande" if es_fixture else "archivo_grande")); continue
         for n in nombres:                                   # nombres tambien en la RUTA
             if n.search(rel):
                 hallazgos.append((rel, 0, "nombre_en_ruta"))
-        if ext not in EXT_TEXTO:
+        if ext not in EXT_TEXTO and not es_fixture:
             hallazgos.append((rel, 0, "tipo_desconocido")); continue
         try:
             texto = p.read_text(encoding="utf-8")
@@ -93,6 +107,8 @@ def escanear(raiz, rutas, prohibidos=()):
         for i, linea in enumerate(texto.splitlines(), 1):
             if IGNORAR_LINEA in linea:
                 continue
+            if es_fixture and "checksumValidation" in linea:
+                hallazgos.append((rel, i, "checksum_en_fixture"))
             for cat, rx in PATRONES.items():
                 if rx.search(linea):
                     hallazgos.append((rel, i, cat))
@@ -138,6 +154,7 @@ def main(argv=None):
     ap.add_argument("--destino", required=True)
     ap.add_argument("--permitidos", default=None, help="def.: publicar.permitidos junto a este script")
     ap.add_argument("--prohibidos", default=None, help="regex por linea, p. ej. nombres de clientes (NO versionar)")
+    ap.add_argument("--fixtures", default=None, help="def.: fixtures.permitidos junto a este script (rutas donde se admite un .xstage sintetico)")
     ap.add_argument("--autor", default="publicador <publicador@example.invalid>")
     ap.add_argument("--mensaje", default="Actualizacion desde el repo de desarrollo")
     ap.add_argument("--empujar", action="store_true")
@@ -146,12 +163,14 @@ def main(argv=None):
     perm = a.permitidos or str(Path(__file__).with_name("publicar.permitidos"))
     lista = leer_lista(perm)
     prohibidos = leer_regex(a.prohibidos) if a.prohibidos else []
+    fx = a.fixtures or str(Path(__file__).with_name("fixtures.permitidos"))
+    fixtures = leer_lista(fx) if Path(fx).exists() else []
     with tempfile.TemporaryDirectory() as tmp:
         raiz = exportar_head(a.origen, tmp)
         rutas = seleccionar(raiz, lista)
         if not rutas:
             print("nada permitido en HEAD: revisa el archivo de permitidos"); return 2
-        h = escanear(raiz, rutas, prohibidos)
+        h = escanear(raiz, rutas, prohibidos, fixtures)
         if h:
             print(f"DETENIDO: {len(h)} hallazgos en {len({x[0] for x in h})} archivos (destino sin tocar)")
             for rel, ln, cat in h[:100]:

@@ -1,0 +1,1027 @@
+{
+ "caso": "c09_puntos_coincidentes",
+ "version_formato": 1,
+ "descripcion": "Trayectoria 3D con tres puntos consecutivos iguales (cuerdas de longitud nula); provoca ZeroDivisionError en lectores ingenuos.",
+ "origen": "paridad",
+ "origen_por_bloque": {
+  "grafo": "regla",
+  "atributos": "regla",
+  "evaluacion": "paridad",
+  "medicion": "harmony"
+ },
+ "medicion": {
+  "estado": "medido",
+  "origen": "harmony",
+  "version_harmony": "24.0.2 build 23443",
+  "fecha": "2026-11-12",
+  "metodo": "medido en Harmony 24 (-batch) sobre una copia de una escena vacia creada por el usuario, a la que se le inserto el contenido del caso editando su XML; la firma de la escena del usuario se conserva sin tocar. Lectura: getMatrix por nodo y atributo DRAWING; render solo en los casos de apagado",
+  "metricas": [
+   4,
+   3,
+   24,
+   24,
+   12
+  ],
+  "K": [
+   0.1111111111111111,
+   0.08333333333333333,
+   0.2222222222222222
+  ],
+  "error_lectura": {
+   "matriz_campos_xy": 5.1e-06,
+   "z_campos": 6.866455078125e-05,
+   "nota": "xy: error de lectura de getMatrix en espacio de matriz; z cuantizada a 1/65536 en espacio de matriz"
+  },
+  "unidades": "matriz y z en campos: F = D^-1 M D con D = diag(KX,KY,KZ,1); matriz = [[a,b,tx],[c,d,ty]]",
+  "nodos": {
+   "Top/Peg_A": {
+    "tipo": "PEG",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.0,
+      "dif_posicion_vs_canales": 0.0,
+      "dif_vs_esperado_z": 0.0
+     },
+     "2": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0833334
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "3": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.1666668
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "4": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.2500002
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "5": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        1.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "6": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.416667
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "7": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.5000004
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "8": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.5833338
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "9": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        1.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "10": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.7500006
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "11": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.833334
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "error_vs_modelo_harmony": 0.01851844,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_posicion_vs_canales": 0.166666,
+      "dif_vs_esperado_z": 0.0
+     },
+     "12": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.9166674
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0
+     },
+     "13": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        1.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_posicion_vs_canales": 0.0,
+      "dif_vs_esperado_z": 0.0
+     }
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.0,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "2": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0833334
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "3": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.1666668
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "4": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.2500002
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "5": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        1.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "6": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.416667
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "7": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.5000004
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "8": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.5833338
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "9": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        1.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "10": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.7500006
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "11": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.833334
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 0.01851844,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "12": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.9166674
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "13": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        1.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     }
+    }
+   }
+  },
+  "trayectoria_vs_evaluador": {
+   "Peg_A": {
+    "columna": "Col_Tray",
+    "llaves": [
+     1,
+     5,
+     9,
+     13
+    ],
+    "fotogramas": {
+     "1": {
+      "medido": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": true
+     },
+     "2": {
+      "medido": [
+       0.083333,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.083333,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": false
+     },
+     "3": {
+      "medido": [
+       0.166667,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.166667,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": false
+     },
+     "4": {
+      "medido": [
+       0.25,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.25,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": false
+     },
+     "5": {
+      "medido": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": true
+     },
+     "6": {
+      "medido": [
+       0.416667,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.416667,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": false
+     },
+     "7": {
+      "medido": [
+       0.5,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.5,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": false
+     },
+     "8": {
+      "medido": [
+       0.583334,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.583333,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": false
+     },
+     "9": {
+      "medido": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": true
+     },
+     "10": {
+      "medido": [
+       0.750001,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.75,
+       0.0,
+       0.0
+      ],
+      "error": 1e-06,
+      "llave": false
+     },
+     "11": {
+      "medido": [
+       0.833334,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.833333,
+       0.0,
+       0.0
+      ],
+      "error": 1e-06,
+      "llave": false
+     },
+     "12": {
+      "medido": [
+       0.916667,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       0.916667,
+       0.0,
+       0.0
+      ],
+      "error": 1e-06,
+      "llave": false
+     },
+     "13": {
+      "medido": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "evaluador": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "error": 0.0,
+      "llave": true
+     }
+    },
+    "error_max": 1e-06,
+    "error_max_en_llaves": 0.0
+   }
+  },
+  "reinterpretacion_al_guardar": {
+   "nodos_antes": 4,
+   "nodos_despues": 4,
+   "cables_antes": 3,
+   "cables_despues": 3,
+   "diferencias": []
+  },
+  "discrepancias_con_regla_paridad": [
+   "f11 Top/Peg_A: posicion medida (0.8333, 0.0000, 0.0000) vs canales (1.0, 0.0, 0.0) [compatibilidad] (dif 0.1667)"
+  ],
+  "notas": [
+   "Los puntos coincidentes (t 5, 9, 13) NO dan posicion constante entre llaves: Harmony avanza con la velocity por defecto (fraccion (f-1)/12 de una longitud 1; f10 = 0,75, f11 = 0,8333) y solo en los cuadros de llave fija vale 1. El esperado de compatibilidad (cuerda nula = constante) solo cubre las llaves; el evaluador de columnas reproduce Harmony en todos los cuadros (error maximo 1e-6)."
+  ]
+ },
+ "escena": {
+  "fotogramas": 13,
+  "fps": 24
+ },
+ "nodos": [
+  {
+   "ruta": "Top/Peg_A",
+   "tipo": "PEG",
+   "nombre": "Peg_A",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Dibujo_A",
+   "tipo": "READ",
+   "nombre": "Dibujo_A",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Composite",
+   "tipo": "COMPOSITE",
+   "nombre": "Composite",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pantalla",
+   "tipo": "DISPLAY",
+   "nombre": "Pantalla",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  }
+ ],
+ "cables_literales": [
+  [
+   "Top",
+   "Top/Peg_A",
+   0,
+   "Top/Dibujo_A",
+   0
+  ],
+  [
+   "Top",
+   "Top/Dibujo_A",
+   0,
+   "Top/Composite",
+   0
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Pantalla",
+   0
+  ]
+ ],
+ "fuentes": {
+  "Top/Dibujo_A": {
+   "0": [
+    [
+     "Top/Peg_A",
+     0
+    ]
+   ]
+  },
+  "Top/Composite": {
+   "0": [
+    [
+     "Top/Dibujo_A",
+     0
+    ]
+   ]
+  },
+  "Top/Pantalla": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  }
+ },
+ "puertos_composite": {
+  "Top/Composite": [
+   0
+  ]
+ },
+ "atributos": {},
+ "evaluacion": {
+  "1": {
+   "Top/Peg_A": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_A"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.0
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "paridad",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_A"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 0.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  },
+  "11": {
+   "Top/Peg_A": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_A"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 1.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.0
+    },
+    "z": 0.0,
+    "matriz": null,
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "paridad",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_A"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 0.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": null,
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  },
+  "13": {
+   "Top/Peg_A": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_A"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 1.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.0
+    },
+    "z": 0.0,
+    "matriz": null,
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "paridad",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_A"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 0.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": null,
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  }
+ }
+}

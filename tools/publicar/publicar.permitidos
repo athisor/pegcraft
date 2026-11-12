@@ -3,7 +3,10 @@ pegcraft/
 crates/
 scripts/
 tests/
+docs/
 tools/publicar/
+tools/sintetico/
+tools/coherencia_path3d.py
 README.md
 LICENSE
 LICENSE-MIT

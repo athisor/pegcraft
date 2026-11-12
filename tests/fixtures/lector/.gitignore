@@ -1,0 +1,4 @@
+# Los .xstage de esta carpeta son SINTETICOS (generados por tools/sintetico/generador.py): si se versionan.
+# El .gitignore de la raiz ignora *.xstage para que no entren escenas de produccion en ninguna otra parte.
+!*.xstage
+!casos/*.xstage

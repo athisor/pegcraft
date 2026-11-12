@@ -6,23 +6,19 @@ from . import almacen, plano
 
 def rango(spec, xs):
     if spec == "todos":
-        from ..bake import apilado
-        r = apilado.X.escena_resumen(xs)
-        n = r.get("fotogramas") or r.get("frames") or r.get("n_fotogramas")
+        from ..lector import compat
+        n = compat.n_fotogramas(xs)
         if not n:
-            raise SystemExit(f"no pude leer el numero de fotogramas de escena_resumen: {list(r)[:12]}")
+            raise SystemExit(f"no pude leer el numero de fotogramas (scene@nbframes) de {xs}")
         return list(range(1, int(n) + 1))
     if ":" in spec:
         a, b = spec.split(":"); return list(range(int(a), int(b) + 1))
     return [int(x) for x in spec.split(",")]
 
 
-def compilar(xs, frames, salida, conservar_horneado=False, memo_doc=True, residual=True, depurar_personal=False, **kw):
-    """Hornea el rango compartiendo grafo (memo) y almacen de activos, y escribe el plano. Devuelve tiempos y conteos."""
+def compilar(xs, frames, salida, conservar_horneado=False, residual=True, depurar_personal=False, **kw):
+    """Hornea el rango compartiendo la escena abierta (cache de pegcraft.lector) y el almacen de activos, y escribe el plano. Devuelve tiempos y conteos."""
     from ..bake.hornear import hornear
-    from . import memo
-    if memo_doc:
-        memo.activar()
     out = Path(salida); work = out / "_horneado"; work.mkdir(parents=True, exist_ok=True)
     almacen.reset_stats(); almacen.tomar_registro()
     J, REGS, tf = {}, {}, {}
@@ -38,7 +34,7 @@ def compilar(xs, frames, salida, conservar_horneado=False, memo_doc=True, residu
     if not conservar_horneado:
         shutil.rmtree(work, ignore_errors=True)
     return {"plano": str(out / "plano"), **est, "t_hornear_total": round(t_hor, 2), "t_escribir_plano": round(t_esc, 2),
-            "t_por_cuadro": {str(k): round(v, 2) for k, v in tf.items()}, "almacen": {k: (round(v, 2) if isinstance(v, float) else v) for k, v in almacen.STATS.items()}, "memo_doc": dict(memo.STATS)}
+            "t_por_cuadro": {str(k): round(v, 2) for k, v in tf.items()}, "almacen": {k: (round(v, 2) if isinstance(v, float) else v) for k, v in almacen.STATS.items()}}
 
 
 def main(a):

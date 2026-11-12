@@ -1,0 +1,2 @@
+# Los fixtures se comparan byte a byte con lo que genera tools/sintetico: sin conversion de fin de linea.
+* -text

@@ -18,7 +18,7 @@ TVG = os.environ.get("PEGCRAFT_TVG_DIR", "")   # carpeta del lector .tvg (depend
 
 
 def _cargar_tvg():
-    """Importa los modulos del conversor oficial sin pisar otros modulos `svg`/`arbol` ya cargados en el proceso (lector_xstage tiene los suyos)."""
+    """Importa los modulos del conversor oficial sin pisar otros modulos `svg`/`arbol` ya cargados en el proceso."""
     import importlib
     nombres = ("geometria", "svg", "plt_escena", "plt_formato", "arbol", "contenedor", "tvg")
     guardados = {n: sys.modules.pop(n) for n in nombres if n in sys.modules}
@@ -82,10 +82,11 @@ def _stops(par):
                    for p, (r, g, b, a) in par)
 
 
-def convertir(tvg_path, escena, salida):
-    """Escribe en `salida` el SVG del dibujo con gradientes. Devuelve {'gradientes': [...], 'avisos': [...]}. Sin gradientes usados: SVG identico al oficial."""
+def convertir(tvg_path, escena, salida, con_gradientes=True):
+    """Escribe en `salida` el SVG del dibujo con gradientes. Devuelve {'gradientes': [...], 'avisos': [...]}. Sin gradientes usados: SVG identico al oficial.
+    `con_gradientes=False` ni los busca: es la conversion oficial (modelo del .tvg + paleta de la escena -> SVG)."""
     m, mats, el = decodificar(tvg_path, escena)
-    grads = paradas_escena(escena, el)
+    grads = paradas_escena(escena, el) if con_gradientes else {}
     usados = [cid for cid in m["paleta_usada"]] if "paleta_usada" in m else None
     # ids de color de los rellenos del dibujo (cualquier arte)
     ids = set()

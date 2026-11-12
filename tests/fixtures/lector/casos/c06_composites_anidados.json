@@ -1,0 +1,38 @@
+{
+ "nombre": "c06_composites_anidados",
+ "descripcion": "Composite interior dentro de Grupo_Puertas, cuyas salidas 0 y 1 (outport) alimentan los puertos 1 y 2 de Composite_Top.",
+ "fotogramas": 24,
+ "evaluar": [1],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-24", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "READ", "nombre": "Dibujo_Fondo", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "GROUP", "nombre": "Grupo_Puertas",
+   "nodos": [
+    {"tipo": "MULTIPORT_IN", "nombre": "Multi-Port-In", "puertos": [{"tipo": "PEG", "idx": 0}]},
+    {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}, {"tipo": "IMAGE", "idx": 1}]},
+    {"tipo": "COMPOSITE", "nombre": "Comp_Interno", "attrs": {"compositeMode": "compositePassthrough", "flattenOutput": false}},
+    {"tipo": "READ", "nombre": "Dibujo_P1", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+    {"tipo": "READ", "nombre": "Dibujo_P2", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+    {"tipo": "READ", "nombre": "Dibujo_P3", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}}
+   ],
+   "enlaces": [
+    {"origen": "Multi-Port-In", "destino": "Dibujo_P1"},
+    {"origen": "Dibujo_P1", "destino": "Comp_Interno", "puerto_destino": 0},
+    {"origen": "Dibujo_P2", "destino": "Comp_Interno", "puerto_destino": 1},
+    {"origen": "Comp_Interno", "destino": "Multi-Port-Out", "puerto_destino": 0},
+    {"origen": "Dibujo_P3", "destino": "Multi-Port-Out", "puerto_destino": 1}
+   ],
+   "backdrops": [{"titulo": "Puertas", "rect": [-300, -500, -100, -300]}]},
+  {"tipo": "COMPOSITE", "nombre": "Composite_Top", "attrs": {"compositeMode": "compositePassthrough"}},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Dibujo_Fondo", "destino": "Composite_Top", "puerto_destino": 0},
+  {"origen": "Grupo_Puertas", "destino": "Composite_Top", "puerto_origen": 0, "puerto_destino": 1},
+  {"origen": "Grupo_Puertas", "destino": "Composite_Top", "puerto_origen": 1, "puerto_destino": 2},
+  {"origen": "Composite_Top", "destino": "Pantalla"}
+ ]
+}

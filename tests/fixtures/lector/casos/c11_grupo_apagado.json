@@ -1,0 +1,24 @@
+{
+ "nombre": "c11_grupo_apagado",
+ "descripcion": "Grupo_Apagado (apagado) con un READ sin marca propia: apagado=false y apagado_efectivo=true (la herencia la mide Harmony, A4-04).",
+ "fotogramas": 24,
+ "evaluar": [1],
+ "elementos": [{"id": 2, "nombre": "Dibujo_G", "carpeta": "Dibujo_G", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-24", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "GROUP", "nombre": "Grupo_Apagado", "apagado": true,
+   "nodos": [
+    {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}]},
+    {"tipo": "READ", "nombre": "Dibujo_G", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}}
+   ],
+   "enlaces": [{"origen": "Dibujo_G", "destino": "Multi-Port-Out"}]},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Grupo_Apagado", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

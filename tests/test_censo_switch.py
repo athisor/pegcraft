@@ -20,10 +20,10 @@ class TestCensoSwitch(unittest.TestCase):
         try:
             os.environ["PEGCRAFT_SWITCH"] = "0"
             self.assertIsNone(C._modo_switch())
-            os.environ["PEGCRAFT_SWITCH"] = "cuello"
+            os.environ["PEGCRAFT_SWITCH"] = r"/Grupo_Cuello[^/]*/[^/]*$"          # otro valor = regex sobre la ruta del switch
             rx = C._modo_switch()
-            self.assertTrue(rx.search("Top/Flamenco/Deformation-Flamenco_Cuello/Transformation-Switch"))
-            self.assertFalse(rx.search("Top/Flamenco/Deformation-Flamenco_Craneo/Transformation-Switch"))
+            self.assertTrue(rx.search("Top/Rig/Grupo_Cuello_A/Switch"))
+            self.assertFalse(rx.search("Top/Rig/Grupo_Craneo_A/Switch"))
             os.environ["PEGCRAFT_SWITCH"] = "todos"
             self.assertTrue(C._modo_switch().search("x"))
         finally:

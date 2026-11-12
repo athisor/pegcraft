@@ -18,11 +18,11 @@ VERSION = 1
 
 def extraer(xs, f, patron="."):
     """{ruta_read: spec} de los READ con algun deformador activo en el fotograma f. Mismo orden de llamadas que bake/hornear.py."""
-    from ..bake import deformadores as D, censo as C, matriz_causal as mc, apilado  # apilado deja lector_xstage importable
+    from ..bake import deformadores as D, censo as C, matriz_causal as mc
+    from ..lector import compat as L
     xs = str(xs)
     cen = C.censo(xs, f, patron)
-    E = mc._mods()[1]
-    A = mc.aspecto(E.abrir(E.xstage_de(xs)))
+    A = mc.aspecto(L.escena(xs))
     div = mc.camara(xs)["div"]
     segs = {r: D.segmentos(cad) for r, cad in cen.items()}
     segs = {r: sg for r, sg in segs.items() if sg}

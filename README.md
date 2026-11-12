@@ -13,11 +13,32 @@ pensado como base de un clon limpio del subconjunto *cutout* de ese formato.
 
 - `pegcraft/` — paquete Python: horneado de un fotograma (`bake`), compilador de escena a «plano» (`compilar`),
   deformadores, medición de imágenes y utilidades.
+  El lector de escenas `.xstage` (grafo, columnas, evaluación) vive en `pegcraft/lector/`; el horneado lo usa a través de `pegcraft/lector/compat.py`.
+  El conversor `.tvg` → SVG es externo (`PEGCRAFT_TVG_DIR`). Configuración de producción por entorno: `PEGCRAFT_EXCLUIR`, `PEGCRAFT_Z_EXCEPCIONES`.
 - `crates/pegcraft-render` — rasterizador CPU (kurbo + tiny-skia) que dibuja el `escena.json` horneado.
 - `crates/pegcraft-gpu` — spike de rasterizado por GPU (vello sobre wgpu).
 - `crates/pegcraft-viewer`, `crates/pegcraft-viewer-craft` — visores de prueba (egui).
 - `tests/` — pruebas unitarias sintéticas; las que necesitan escenas reales se omiten solas.
 - `scripts/` — envoltorios finos de la CLI.
+
+## El lector de escenas `.xstage`
+
+`pegcraft/lector/` lee una escena `.xstage` (solo lectura, solo biblioteca estándar de Python): grafo de nodos y cables, columnas (exposición, funciones
+Bézier, trayectorias 3D) y evaluación de un nodo en un fotograma (canales, cadena de transformadores, Z, matriz, dibujo).
+
+- **Alcance de sala limpia:** `pegcraft/lector/**`, `tools/sintetico/**`, `tools/coherencia_path3d.py` y sus pruebas. El resto de `pegcraft` no se presenta
+  como sala limpia. De dónde sale cada regla (observación de archivos propios, medición en Harmony como caja negra o convención de compatibilidad) está en
+  [`docs/lector/PROCEDENCIA.md`](docs/lector/PROCEDENCIA.md).
+- **Dos modos de evaluación** (`Evaluador(escena, modo=...)`):
+  - `"paridad"` (por omisión) es el modo de compatibilidad, el que consume el horneado. Sus convenciones son explícitas: la matriz va en campos sin
+    compensar el aspecto de la escena (anisótropa), el sesgo no se aplica a la matriz y un PEG apagado cuenta en la cadena y suma su Z. Son
+    convenciones, no verdad medida.
+  - `"harmony"` está medido en Harmony sobre escenas sintéticas: PEG apagado = identidad, sesgo aplicado, matriz compuesta en espacio de matriz y
+    devuelta en campos.
+- **Las escenas de prueba son sintéticas:** las genera `tools/sintetico/generador.py` desde una especificación JSON (`tests/fixtures/lector/casos/`).
+  No hay escenas de producción en el repositorio.
+
+Pruebas: `python -I -m unittest discover -s tests -p "test_*.py"`.
 
 ## Reglas del proyecto
 
@@ -28,7 +49,7 @@ pensado como base de un clon limpio del subconjunto *cutout* de ese formato.
 
 ## Qué falta (resumen honesto)
 
-- El lector de `.xstage`/`.tvg` que el horneado necesita **no está en este repositorio** (dependencia externa).
-- No hay escenas de ejemplo; las pruebas que las necesitan se omiten solas.
+- El lector de `.xstage` es parte del repositorio (`pegcraft/lector/`). El conversor `.tvg` → SVG **no está** (dependencia externa, `PEGCRAFT_TVG_DIR`).
+- No hay escenas de producción de ejemplo; las pruebas del horneado usan casos sintéticos (`tests/fixtures/lector/casos/`) y las que necesitan una escena propia se omiten solas.
 - Licencia `MIT OR Apache-2.0` (`LICENSE-MIT`, `LICENSE-APACHE`, `NOTICE`); procedencia de lo consultado en `ATTRIBUTION.md`.
 - No se ha probado la compilación ni la instalación fuera del equipo de origen. Detalle en `LIMPIEZA_PENDIENTE.md`.

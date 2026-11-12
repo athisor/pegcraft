@@ -2,13 +2,20 @@
 Los avisos no cambian el render. Sintetico (grafo y XML falsos) + codigos de compilar/avisos.py.
 python -m unittest discover -s tests -p test_avisos_efectos.py"""
 import os, sys, unittest
-import xml.etree.ElementTree as ET
-from types import SimpleNamespace
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lector"))   # constructor de escenas sinteticas (A5)
 import numpy as np
 from pegcraft.bake import apilado, matriz_causal as mc
 from pegcraft.compilar import avisos
+from pegcraft.lector import compat as L
+from test_evaluar_ayuda import Escenas, cable, modulo, peg, xstage
+
+ESC = Escenas()
+
+
+def tearDownModule():
+    ESC.cerrar()
 
 
 class TestEfectos(unittest.TestCase):
@@ -38,17 +45,11 @@ class TestEfectos(unittest.TestCase):
 
 
 def _pc2(attrs_xml):
-    """Fakes minimos para llegar al aviso de _constraints_pc2: un PointConstraint2 con dos PEG hermanos (L0 = 0 -> sale tras avisar)."""
-    attrs = ET.fromstring("<attrs>" + attrs_xml + "</attrs>")
-    el = SimpleNamespace(find=lambda r: attrs if r == "attrs" else None)
-    nodos = {"PC": SimpleNamespace(type="PointConstraint2"), "E0": SimpleNamespace(type="PEG"), "E1": SimpleNamespace(type="PEG")}
-    g = SimpleNamespace(nodes=nodos, resolve_source=lambda pc, p: [("E0", 0), ("E1", 0)][p])
-    doc = SimpleNamespace(nodes={"PC": SimpleNamespace(element=el), "E0": SimpleNamespace(element=ET.fromstring("<m/>")), "E1": SimpleNamespace(element=ET.fromstring("<m/>"))})
-    C = SimpleNamespace(ruta_nodo=lambda r: r)
-    L = SimpleNamespace(cadena_de=lambda g, r, modo: [])
-    J = SimpleNamespace(_num=lambda doc, e, f: (float(e.get("val")), None))
+    """Escena sintetica minima para llegar al aviso de _constraints_pc2: un PointConstraint2 con dos PEG hermanos (L0 = 0 -> sale tras avisar)."""
+    nodos = [peg("E0"), peg("E1"), modulo("PointConstraint2", "PC", attrs_xml)]
+    ruta = str(ESC.abrir_xml(xstage(nodos, cable("E0", "PC", 0, 0) + cable("E1", "PC", 0, 1))).ruta)
     av = []
-    mc._constraints_pc2(g, doc, 4 / 3, 1, lambda r: np.eye(3), C, L, J, av)
+    mc._constraints_pc2(L.escena(ruta), L.evaluador(ruta), 4 / 3, 1, lambda r: np.eye(3), av)
     return av
 
 

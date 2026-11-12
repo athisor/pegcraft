@@ -81,5 +81,66 @@ class TestPublicar(unittest.TestCase):
         self.assertEqual(P.main(["--origen", str(o), "--destino", str(dest), "--permitidos", permitidos("pkg/"), "--en-seco"]), 0)
 
 
+XSTAGE_OK = '<?xml version="1.0" encoding="UTF-8"?>\n<project version="2402">\n <module name="Pieza_A"/>\n</project>\n'
+FIXT = "tests/fixtures/lector/"
+
+
+def fixtures(*lineas):
+    f = Path(tempfile.mkdtemp()) / "fix.txt"; f.write_text("\n".join(lineas), encoding="utf-8"); return str(f)
+
+
+class TestFixtures(unittest.TestCase):
+    def publicar(self, archivos, prohibidos=None, fix=FIXT):
+        o = repo(archivos)
+        dest = Path(tempfile.mkdtemp()) / "l"
+        args = ["--origen", str(o), "--destino", str(dest), "--permitidos", permitidos("tests/", "docs/"), "--fixtures", fixtures(fix)]
+        if prohibidos:
+            f = Path(tempfile.mkdtemp()) / "proh.txt"; f.write_text("\n".join(prohibidos), encoding="utf-8"); args += ["--prohibidos", str(f)]
+        return P.main(args), dest
+
+    def test_xstage_sintetico_limpio_se_publica(self):
+        cod, dest = self.publicar({FIXT + "casos/a.xstage": XSTAGE_OK, "docs/nota.md": "# nota\n"})
+        self.assertEqual(cod, 0)
+        self.assertTrue((dest / FIXT / "casos" / "a.xstage").exists())
+        self.assertTrue((dest / "docs" / "nota.md").exists())          # docs/ esta en publicar.permitidos
+
+    def test_xstage_fuera_de_fixtures_sigue_bloqueado(self):
+        cod, dest = self.publicar({"tests/otra/a.xstage": XSTAGE_OK})
+        self.assertEqual(cod, 2)
+        self.assertFalse(dest.exists())
+
+    def test_fixture_con_nombre_prohibido_falla_con_2(self):
+        cod, dest = self.publicar({FIXT + "a.xstage": XSTAGE_OK.replace("Pieza_A", "Personaje_Real")}, prohibidos=[r"\bPersonaje_Real\b"])
+        self.assertEqual(cod, 2)
+        self.assertFalse(dest.exists())
+        o = repo({FIXT + "a.xstage": XSTAGE_OK.replace("Pieza_A", "Personaje_Real")})
+        h = P.escanear(P.exportar_head(o, tempfile.mkdtemp()), [FIXT + "a.xstage"], [r"\bpersonaje_real\b"], [FIXT])
+        self.assertEqual([(c) for _, _, c in h], ["nombre"])
+
+    def test_nombre_prohibido_en_la_ruta_del_fixture(self):
+        o = repo({FIXT + "Personaje_Real.xstage": XSTAGE_OK})
+        h = P.escanear(P.exportar_head(o, tempfile.mkdtemp()), [FIXT + "Personaje_Real.xstage"], ["personaje_real"], [FIXT])
+        self.assertEqual([c for _, _, c in h], ["nombre_en_ruta"])
+
+    def test_fixture_con_checksum_ruta_absoluta_o_grande(self):
+        casos = {"checksum": (XSTAGE_OK.replace("</project>", ' <meta type="checksumValidation"/>\n</project>'), "checksum_en_fixture"),
+                 "ruta": (XSTAGE_OK.replace('"Pieza_A"', '"D:\\\\proyectos\\\\x"'), "ruta_disco"),   # publicar: permitir
+                 "grande": (XSTAGE_OK.replace("</project>", " <!-- " + "x" * 200_000 + " -->\n</project>"), "fixture_grande")}
+        for nombre, (txt, cat) in casos.items():
+            o = repo({FIXT + "a.xstage": txt})
+            h = P.escanear(P.exportar_head(o, tempfile.mkdtemp()), [FIXT + "a.xstage"], [], [FIXT])
+            self.assertIn(cat, {c for _, _, c in h}, nombre)
+            cod, dest = self.publicar({FIXT + "a.xstage": txt})
+            self.assertEqual(cod, 2, nombre)
+
+    def test_archivos_del_repo_real_cumplen(self):
+        """El ejemplo de prohibidos y los permitidos del repo se pueden leer; el ejemplo no contiene nombres reales."""
+        aqui = Path(__file__).parent
+        self.assertIn("docs/", P.leer_lista(aqui / "publicar.permitidos"))
+        self.assertEqual(P.leer_lista(aqui / "fixtures.permitidos"), [FIXT])
+        for r in P.leer_regex(aqui / "prohibidos.local.txt.ejemplo"):
+            self.assertRegex(r, r"(Ejemplo|EP99)")
+
+
 if __name__ == "__main__":
     unittest.main()

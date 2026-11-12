@@ -2,7 +2,7 @@
 
 REGLA (MEDIDO en PLANO fN, (doc interna omitida) §8): las posiciones, pivotes y traslaciones del .xstage estan en CAMPOS de
 una rejilla con aspecto `options/metrics` unitAspectRatioX:unitAspectRatioY (4:3): un campo en X mide A = 4/3 de un campo en Y. Los
-dibujos (.tvg) y los giros viven en un espacio ISOTROPO. Componer giros/espejos con las x "en campos" (como escena_evaluar) deja
+dibujos (.tvg) y los giros viven en un espacio ISOTROPO. Componer giros/espejos con las x "en campos" (como Evaluador.nodos) deja
 cada traslacion en x corta por 1/A: de ahi el desfase empirico (3,425 = 10,3054/3 de un nodo de espejo) y el error de cejas y espejos.
   x_iso = A * x_campo ; y_iso = y_campo                       (posicion, pivote, translate del static, offset/pivot del READ)
   PEG:    x' = P + c + R(rot) * K(sesgo) * S(escala) * (x - c)
@@ -12,38 +12,32 @@ La matriz sale en campos-Y isotropos: sirve con la camara `iso` (sx = sy = 44,68
 Sesgo: K = [[1, tan(sesgo)], [0, 1]] (signo SUPUESTO: ver SIGNO_SESGO). No evalua deformadores ni expresiones.
 PointConstraint2 (dos puntos): SI, con la regla medida en PLANO (ver CONSTRAINTS); PEGCRAFT_CONSTRAINTS=0 o constraints=False lo apaga.
 Uso: matrices(xstage, fotograma, [rutas Top/...], avisos) -> {ruta: [[a, b, tx], [c, d, ty]]}
-CLI: python -I matriz_causal.py <xstage> <fotograma> <regex>   (imprime la matriz causal y la de escena_evaluar)
+CLI: python -I -m pegcraft.bake.matriz_causal <xstage> <fotograma> <regex>   (imprime la matriz causal y la de Evaluador.nodos)
 """
 import sys, math, re, os
 sys.dont_write_bytecode = True
 import numpy as np
+from ..lector import compat as L   # lector de escenas del repo (pegcraft/lector): Escena y Evaluador
+from ..lector.resumen import buscar
 
 # SUPUESTO (indicio debil): +1, K = [[1, tan], [0, 1]]. Unico caso (Ceja-P-P_1, 3,76 grados): cizalla residual ECC -0,117 (+1), -0,141 (0),
-# -0,171 (-1); el IoU no distingue (0,799 / 0,796 / 0,796). 0 = ignorar el sesgo (como escena_evaluar).
+# -0,171 (-1); el IoU no distingue (0,799 / 0,796 / 0,796). 0 = ignorar el sesgo (como Evaluador.nodos, R4).
 SIGNO_SESGO = float(os.environ.get("PEGCRAFT_SIGNO_SESGO", "1"))
 ASPECTO = os.environ.get("PEGCRAFT_ASPECTO")                        # diagnostico: fuerza A (p. ej. 1 = sin la regla)
 
 
-def _mods():
-    from . import apilado   # deja lector_xstage importable
-    from lector_xstage.core.scene_graph import SceneGraph
-    from lector_xstage.propuesta_layout import evaluar as E, cadena as C, lectura as L, caja as J
-    from lector_xstage.propuesta_layout.pose import transformacion
-    return SceneGraph, E, C, L, J, transformacion
-
-
-def aspecto(doc):
-    """A = unitAspectRatioX / unitAspectRatioY de options/metrics (4/3 si falta)."""
+def aspecto(escena):
+    """A = unitAspectRatioX / unitAspectRatioY de options/metrics de la `Escena` (4/3 si falta)."""
     if ASPECTO:
         return float(ASPECTO)
-    mt = doc.root.find("options/metrics")
+    mt = escena.raiz.find("options/metrics")
     try:
         return float(mt.get("unitAspectRatioX")) / float(mt.get("unitAspectRatioY"))
     except Exception:
         return 4.0 / 3.0
 
 
-# Camara por omision cuando el .xstage NO trae `options/metrics` ni `pixelPerModelUnitForVectorLayers` (escenas armadas por lector_xstage, p. ej. PLANO:
+# Camara por omision cuando el .xstage NO trae `options/metrics` ni `pixelPerModelUnitForVectorLayers` (escenas armadas por herramienta, p. ej. PLANO:
 # 43 KB, `options` solo con resolution/framerate/colorSpace). Antes: AttributeError (`mt` es None). Valores = los de TODAS las escenas del estudio con metrics
 # (banco\\*, BG_PLANO, BG_PLANO: numberOfUnitsY=24, pixelPerModelUnitForVectorLayers=0,288) [dato: todas las escenas]. Que Harmony use ESTOS valores al abrir
 # una escena sin metrics se comprueba comparando con su render (<datos de trabajo omitidos> <datos de trabajo omitidos>); si no hay `metrics`, se avisa.
@@ -56,10 +50,9 @@ def camara(xstage, ancho=1920, alto=1080, avisos=None):
     s = alto / numberOfUnitsY px por campo-Y (1080/24 = 45); div = s / pixelPerModelUnitForVectorLayers (45/0,288 = 156,25 tvg por campo-Y).
     MEDIDO en PLANO: el ajuste `iso` (44,685; 155,125) tiene el mismo s/div (0,28806) pero deja a Personaje corrida (-4,5; -3) px, porque
     su traslacion (13,74; -12,32 campos) se multiplica por s. El PEG de la camara se evalua aparte (`camara_peg`, aplicado en hornear.mat); el FOV no (de fabrica, 41,112)."""
-    _, E, *_ = _mods()
-    doc = E.abrir(E.xstage_de(xstage))
-    mt = doc.root.find("options/metrics")
-    pp = doc.root.find("options/pixelPerModelUnitForVectorLayers")
+    raiz = L.escena(xstage).raiz
+    mt = raiz.find("options/metrics")
+    pp = raiz.find("options/pixelPerModelUnitForVectorLayers")
     uy = float(mt.get("numberOfUnitsY")) if mt is not None and mt.get("numberOfUnitsY") else None
     ppv = float(pp.get("val")) if pp is not None and pp.get("val") else None
     if uy is None or ppv is None:
@@ -86,27 +79,25 @@ def camara_peg(xstage, f, avisos=None, tol=1e-9):
     if os.environ.get("PEGCRAFT_CAMARA_PEG", "").strip().lower() in ("no", "0", "off", "false"):
         return None
     av = avisos if avisos is not None else []
-    _, E, *_ = _mods()
-    from . import apilado
-    X = apilado.X
     try:
-        cams = X.nodo_buscar(xstage, tipos=["CAMERA"], apagados=False, enlaces="resueltos", max=20)["nodos"]
-        cams = [c for c in cams if c.get("entradas")]
+        esc = L.escena(xstage)
+        ev = L.evaluador(xstage)
+        cams = [c for c in buscar(esc, tipos=["CAMERA"], apagados=False, max=20) if c.get("entradas")]
         if not cams:
             return None
         if len(cams) > 1:
             av.append(f"camara: {len(cams)} nodos CAMERA con entrada ({', '.join(c['ruta'] for c in cams)}); se usa {cams[0]['ruta']}")
         cam = cams[0]
-        vec = X.nodo_vecinos(xstage, cam["ruta"], sentido="arriba", profundidad=1, cruzar_grupos=True)["vecinos"]
-        pegs = [v for v in vec if v["tipo"] == "PEG"]
+        vec = esc.vecinos(cam["ruta"], "arriba", 1, True)               # [(ruta, tipo)]
+        pegs = [v for v in vec if v[1] == "PEG"]
         if not pegs:
             if vec:
-                av.append(f"camara: {cam['ruta']} se alimenta de {vec[0]['ruta']} ({vec[0]['tipo']}), no de un PEG; no se evalua")
+                av.append(f"camara: {cam['ruta']} se alimenta de {vec[0][0]} ({vec[0][1]}), no de un PEG; no se evalua")
             return None
-        peg = pegs[0]["ruta"]
-        padres = X.nodo_vecinos(xstage, peg, sentido="arriba", profundidad=None, cruzar_grupos=True)["vecinos"]
-        cuelga = [v["ruta"] for v in padres if v["tipo"] == "PEG"]
-        fila = X.peg_volcar(xstage, peg=peg[4:] if peg.startswith("Top/") else peg, desde=f, hasta=f, max=5)["filas"][0]
+        peg = pegs[0][0]
+        padres = esc.vecinos(peg, "arriba", None, True)
+        cuelga = [v[0] for v in padres if v[1] == "PEG"]
+        fila = L.fila_peg(xstage, peg, f)
     except (Exception, SystemExit) as ex:
         av.append(f"camara: no se pudo leer el PEG de la camara ({type(ex).__name__}: {str(ex)[:120]}); se hornea sin el")
         return None
@@ -120,15 +111,14 @@ def camara_peg(xstage, f, avisos=None, tol=1e-9):
     identidad = abs(x) < tol and abs(y) < tol and abs(z) < tol and abs(ex_ - 1.0) < tol and abs(ey_ - 1.0) < tol
     if not identidad and abs(ex_ - ey_) > 1e-6:
         av.append(f"camara: {peg} tiene escala x={ex_:g} != y={ey_:g}; se usa x (anisotropia de camara no probada)")
-    doc = E.abrir(E.xstage_de(xstage))
-    mt = doc.root.find("options/metrics")
+    mt = esc.raiz.find("options/metrics")
     try:
         d_un = float(mt.get("numberOfUnitsY")) / 2.0
     except Exception:
         d_un = UNIDADES_Y_DEFECTO / 2.0
     d_off = None
     try:
-        v = float(X.nodo_atributo(xstage, cam["ruta"], "offset.z", fotograma=f)["valor_en_fotograma"])
+        v = float(ev.valor(cam["ruta"], "offset.z", f))
         d_off = v if v > 0 else None
     except (Exception, SystemExit):
         d_off = None
@@ -136,8 +126,8 @@ def camara_peg(xstage, f, avisos=None, tol=1e-9):
     ox = oy = 0.0
     if os.environ.get("PEGCRAFT_CAMARA_OFFSET", "").strip().lower() not in ("no", "0", "off", "false"):
         try:
-            ox = float(X.nodo_atributo(xstage, cam["ruta"], "offset.x", fotograma=f)["valor_en_fotograma"])
-            oy = float(X.nodo_atributo(xstage, cam["ruta"], "offset.y", fotograma=f)["valor_en_fotograma"])
+            ox = float(ev.valor(cam["ruta"], "offset.x", f))
+            oy = float(ev.valor(cam["ruta"], "offset.y", f))
         except (Exception, SystemExit):
             ox = oy = 0.0
     hay_offset = abs(ox) > tol or abs(oy) > tol
@@ -153,7 +143,7 @@ def camara_peg(xstage, f, avisos=None, tol=1e-9):
         av.append(f"camara: {cam['ruta']} sin offset.z; d = numberOfUnitsY/2 = {d_un:g}")
     if identidad and not reencuadre and not hay_offset:
         return None   # identidad (salvo rotacion, que no se aplica), offset.z = unidades/2 y offset.x/y = 0: el horneado queda IDENTICO
-    return {"ruta": peg, "x": x, "y": y, "z": z, "escala": ex_, "rot": rot, "d": d, "d0": d_un, "A": aspecto(doc), "d_offset": d_off, "d_unidades": d_un, "ox": ox, "oy": oy}
+    return {"ruta": peg, "x": x, "y": y, "z": z, "escala": ex_, "rot": rot, "d": d, "d0": d_un, "A": aspecto(esc), "d_offset": d_off, "d_unidades": d_un, "ox": ox, "oy": oy}
 
 
 def centro_camara(camp):
@@ -205,24 +195,24 @@ CONSTRAINTS = os.environ.get("PEGCRAFT_CONSTRAINTS", "1") != "0"
 VOLUMEMIN_DEF, VOLUMEMAX_DEF = 25.0, 200.0
 
 
-def _constraints_pc2(g, doc, A, fotograma, eslabon, C, L, J, avisos):
-    """{ruta del PointConstraint2: W (3x3, mundo)} tal que la pieza que cuelga de el (por el puerto 0) pasa de M a W @ M."""
+def _constraints_pc2(g, ev, A, fotograma, eslabon, avisos):
+    """{ruta del PointConstraint2: W (3x3, mundo)} tal que la pieza que cuelga de el (por el puerto 0) pasa de M a W @ M.
+    `g` = Escena, `ev` = Evaluador (modo paridad) de la misma escena."""
     out, raros = {}, []
-    for pc, n in g.nodes.items():
-        if n.type != "PointConstraint2":
+    for pc, n in g.nodos.items():
+        if n.tipo != "PointConstraint2":
             continue
-        e0, e1 = g.resolve_source(pc, 0), g.resolve_source(pc, 1)
+        e0, e1 = g.fuente(pc, 0), g.fuente(pc, 1)
         if not (e0 and e1):
             continue
         e0, e1 = e0[0], e1[0]
-        el = doc.nodes[C.ruta_nodo(pc)].element
-        a = el.find("attrs")
+        a = n.elem.find("attrs")
 
-        def num(r, neutro):
-            x, _ = J._num(doc, a.find(r), fotograma) if a is not None and a.find(r) is not None else (None, None)
+        def num(r, neutro, pc=pc, a=a):
+            x = ev.valor(pc, r, fotograma) if a is not None and a.find(r) is not None else None
             return neutro if x is None else float(x)
 
-        def txt(r):
+        def txt(r, a=a):
             t = a.find(r) if a is not None else None
             return t.get("val") if t is not None else None
         act, vol = num("active", 100.0) / 100.0, num("volumemod", 75.0) / 100.0
@@ -238,17 +228,17 @@ def _constraints_pc2(g, doc, A, fotograma, eslabon, C, L, J, avisos):
 
         def padre(r):
             M = np.eye(3)
-            for p in L.cadena_de(g, r, "nunca"):
+            for p in ev.cadena(r, "nunca"):
                 M = eslabon(p) @ M
             return M
         Mp = padre(e0)
-        if g.nodes[e0].type != "PEG" or g.nodes[e1].type != "PEG" or not np.allclose(Mp, padre(e1), atol=1e-6):
+        if g.nodos[e0].tipo != "PEG" or g.nodos[e1].tipo != "PEG" or not np.allclose(Mp, padre(e1), atol=1e-6):
             raros.append(f"{pc} (entradas sin padre comun: no se aplica)")
             continue
 
         def piv(r):
             M = eslabon(r)
-            t_el = doc.nodes[C.ruta_nodo(r)].element.find("attrs/pivot")
+            t_el = g.nodos[r].elem.find("attrs/pivot")
             c = np.array([A * float(t_el.find("x").get("val", 0)) if t_el is not None else 0.0,
                           float(t_el.find("y").get("val", 0)) if t_el is not None else 0.0, 1.0])
             return c[:2], (M @ c)[:2], M
@@ -270,16 +260,17 @@ def _constraints_pc2(g, doc, A, fotograma, eslabon, C, L, J, avisos):
     return out
 
 
-def _m_read(doc, J, A, fotograma, ruta, C):
-    """3x3 propia del READ (offset, escala, giro, pivote y sesgo de sus atributos); identidad si no tiene attrs."""
-    a = doc.nodes[C.ruta_nodo(ruta)].element.find("attrs")
+def _m_read(g, ev, A, fotograma, ruta):
+    """3x3 propia del READ (offset, escala, giro, pivote y sesgo de sus atributos); identidad si no tiene attrs. `g` = Escena, `ev` = Evaluador."""
+    a = g.nodos[ruta].elem.find("attrs")
     if a is None:
         return np.eye(3)
 
     def v(r, neutro):
-        x, _ = J._num(doc, a.find(r), fotograma)
-        return neutro if x is None else x
-    sep = J._separado(a, "scale") or a.find("scale/separate") is None
+        x = ev.valor(ruta, r, fotograma) if a.find(r) is not None else None
+        return neutro if not isinstance(x, (int, float)) else x
+    s_sep = a.find("scale/separate")
+    sep = s_sep is None or s_sep.get("val", "").lower() == "true"       # sin `scale/separate`: ejes separados
     sx, sy = (v("scale/x", 1.0), v("scale/y", 1.0)) if sep else (v("scale/xy", 1.0),) * 2
     rot = v("rotation/anglez", 0.0) if a.find("rotation/anglez") is not None else v("angle", 0.0)
     t = {"posicion.x": v("offset/x", 0.0), "posicion.y": v("offset/y", 0.0), "escala.x": sx, "escala.y": sy, "rotacion": rot,
@@ -291,22 +282,20 @@ def pre_matrices(xstage, fotograma, segmentos):
     """Deformadores bajo PEGs: la deformacion actua en el espacio de DESPUES de las transformaciones que hay entre el READ (o el deformador
     anterior) y ella. segmentos = {ruta_read: [[ruta_peg, ...] (del mas cercano al mas lejano), ...]} (uno por deformador activo, del mas cercano al
     mas lejano) -> {ruta_read: [3x3 (campos-Y isotropos) por segmento]}. El primer segmento incluye la matriz propia del READ."""
-    SceneGraph, E, C, L, J, transformacion = _mods()
-    xs = E.xstage_de(xstage)
-    doc = E.abrir(xs)
-    A = aspecto(doc)
+    g, ev = L.escena(xstage), L.evaluador(xstage)
+    A = aspecto(g)
     cache = {}
 
     def eslabon(p):
         if p not in cache:
-            t = transformacion(doc, doc.nodes[C.ruta_nodo(p)].element, fotograma)
+            t = ev.canales(p, fotograma)
             cache[p] = _m(t, A, float(t.get("sesgo", 0.0) or 0.0))
         return cache[p]
     out = {}
     for ruta, segs in segmentos.items():
         ms = []
         for k, pegs in enumerate(segs):
-            M = _m_read(doc, J, A, fotograma, ruta, C) if k == 0 else np.eye(3)
+            M = _m_read(g, ev, A, fotograma, ruta) if k == 0 else np.eye(3)
             for p in pegs:
                 M = eslabon(p) @ M
             ms.append(M)
@@ -315,45 +304,42 @@ def pre_matrices(xstage, fotograma, segmentos):
 
 
 def matrices(xstage, fotograma, rutas, avisos=None, constraints=None):
-    SceneGraph, E, C, L, J, transformacion = _mods()
     avisos = avisos if avisos is not None else []
     constraints = CONSTRAINTS if constraints is None else constraints
-    xs = E.xstage_de(xstage)
-    g = SceneGraph.from_xstage(str(xs))
-    doc = E.abrir(xs)
-    A = aspecto(doc)
+    g, ev = L.escena(xstage), L.evaluador(xstage)
+    A = aspecto(g)
     cache, out, con_sesgo, deform = {}, {}, set(), 0
 
     def eslabon(p):
         if p not in cache:
-            t = transformacion(doc, doc.nodes[C.ruta_nodo(p)].element, fotograma)
+            t = ev.canales(p, fotograma)
             sg = float(t.get("sesgo", 0.0) or 0.0)
             if abs(sg) > 1e-6:
                 con_sesgo.add(p)
             cache[p] = _m(t, A, sg)
         return cache[p]
 
-    PC2 = _constraints_pc2(g, doc, A, fotograma, eslabon, C, L, J, avisos) if constraints else {}
+    PC2 = _constraints_pc2(g, ev, A, fotograma, eslabon, avisos) if constraints else {}
     con_pc2 = 0
     for ruta in rutas:
-        if ruta not in g.nodes:
+        if ruta not in g.nodos:
             continue
         M = np.eye(3)
-        for p in L.cadena_de(g, ruta, "si_transforma"):      # del mas cercano al mas lejano
+        for p in ev.cadena(ruta, "si_transforma"):           # del mas cercano al mas lejano
             M = eslabon(p) @ M
         if PC2:                                               # constraints del camino por el puerto 0, del mas cercano al mas lejano
-            cur, visto, Ws = g.resolve_source(ruta, 0), set(), []
+            cur, visto, Ws = g.fuente(ruta, 0), set(), []
             while cur is not None and cur[0] not in visto:
                 visto.add(cur[0])
                 if cur[0] in PC2:
                     Ws.append(PC2[cur[0]])
-                cur = g.resolve_source(cur[0], 0)
+                cur = g.fuente(cur[0], 0)
             for W in Ws:
                 M = W @ M
             con_pc2 += bool(Ws)
-        if g.nodes[ruta].type == "READ":
-            M = M @ _m_read(doc, J, A, fotograma, ruta, C)
-        if any("Module" in g.nodes[s].type for s, _ in g.input_cables(ruta, 0)):
+        if g.nodos[ruta].tipo == "READ":
+            M = M @ _m_read(g, ev, A, fotograma, ruta)
+        if any("Module" in g.nodos[s].tipo for s, _ in g.fuentes(ruta, 0)):
             deform += 1
         out[ruta] = [[round(float(x), 6) for x in fila] for fila in M[:2].tolist()]
     avisos.append(f"matriz causal: aspecto de unidad {A:.5f}; sesgo aplicado en {len(con_sesgo)} PEG {sorted(con_sesgo)[:4]}; "
@@ -364,14 +350,12 @@ def matrices(xstage, fotograma, rutas, avisos=None, constraints=None):
 
 if __name__ == "__main__":
     xs, f, rx = sys.argv[1], int(sys.argv[2]), re.compile(sys.argv[3], re.I)
-    _mods()
-    from pegcraft.bake import apilado
-    ev = apilado.X.escena_evaluar(xs, fotograma=f, tipos=["READ"], solo_con_dibujo=True, max=2000)["nodos"]
-    rutas = [apilado.norm(n["ruta"]) for n in ev if rx.search(n["ruta"])]
+    ev = L.nodos_evaluados(xs, f)
+    rutas = [L.norm(n["ruta"]) for n in ev if rx.search(n["ruta"])]
     av = []
     mc = matrices(xs, f, rutas, av)
     for n in ev:
-        r = apilado.norm(n["ruta"])
+        r = L.norm(n["ruta"])
         if r in mc:
             print(r, "\n  causal ", mc[r], "\n  evaluar", n["matriz"])
     print(av)

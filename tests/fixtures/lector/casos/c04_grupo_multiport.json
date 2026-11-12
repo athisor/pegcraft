@@ -1,0 +1,32 @@
+{
+ "nombre": "c04_grupo_multiport",
+ "descripcion": "Grupo_1 con Multi-Port-In y una salida MULTIPORT_OUT llamada no-name_1; el PEG de la raiz alimenta al PEG interior a traves del grupo.",
+ "fotogramas": 24,
+ "evaluar": [1],
+ "elementos": [{"id": 2, "nombre": "Dibujo_G", "carpeta": "Dibujo_G", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-24", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_Raiz", "attrs": {"rotation/anglez": 90}},
+  {"tipo": "GROUP", "nombre": "Grupo_1",
+   "nodos": [
+    {"tipo": "MULTIPORT_OUT", "nombre": "no-name_1", "puertos": [{"tipo": "IMAGE", "idx": 0}]},
+    {"tipo": "MULTIPORT_IN", "nombre": "Multi-Port-In", "puertos": [{"tipo": "PEG", "idx": 0}]},
+    {"tipo": "PEG", "nombre": "Peg_G", "attrs": {"scale/x": 2}},
+    {"tipo": "READ", "nombre": "Dibujo_G", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}}
+   ],
+   "enlaces": [
+    {"origen": "Multi-Port-In", "destino": "Peg_G"},
+    {"origen": "Peg_G", "destino": "Dibujo_G"},
+    {"origen": "Dibujo_G", "destino": "no-name_1"}
+   ]},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_Raiz", "destino": "Grupo_1"},
+  {"origen": "Grupo_1", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

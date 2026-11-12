@@ -9,7 +9,7 @@ from collections import Counter
 # (codigo, regex sobre el texto, que significa para quien consume el plano)
 REGLAS = [
     ("SESGO_NO_CONSIDERADO", r"^/.*: sesgo \S+ no se considera", "un PEG con sesgo (skew) que el motor no aplica"),
-    ("TVG_ILEGIBLE", r"^TVG_ILEGIBLE ", "el lector .tvg (lector_xstage) no pudo leer el dibujo: la pieza se omite (upstream: (doc interna omitida)"),
+    ("TVG_ILEGIBLE", r"^TVG_ILEGIBLE ", "el conversor .tvg externo (PEGCRAFT_TVG_DIR) no pudo leer el dibujo: la pieza se omite"),
     ("SIN_TVG", r"^sin tvg ", "READ sin dibujo .tvg en la escena: pieza sin SVG"),
     ("MATRIZ_CAUSAL", r"^matriz causal:", "informativo: aspecto de unidad y PEG con sesgo aplicado"),
     ("DEFORMADOR_MODELO", r"^deformadores: modelo", "informativo: modelo de deformadores usado"),

@@ -1,0 +1,26 @@
+{
+ "nombre": "c15_y_distinto_ylocal",
+ "descripcion": "Puntos con y distinto de yLocal: manda yLocal (R1). El offset z del READ trae yLocal 0 e y 0,01.",
+ "fotogramas": 5,
+ "evaluar": [1, 3, 5],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-5", "dibujo": "1"}]},
+  {"nombre": "Col_EscX", "tipo": 3, "puntos": [
+   {"x": "1", "yLocal": 0.5, "y": 0.01, "constSeg": false},
+   {"x": "5", "yLocal": 1.5, "y": 0.01, "constSeg": false}]},
+  {"nombre": "Col_OffZ", "tipo": 3, "puntos": [
+   {"x": "1-5", "yLocal": 0.0, "y": 0.01, "constSeg": true}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_A", "attrs": {"scale/x": {"val": 1, "col": "Col_EscX"}}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}, "offset/z": {"val": 0, "col": "Col_OffZ"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_A", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

@@ -1,0 +1,617 @@
+{
+ "caso": "c10_peg_apagado",
+ "version_formato": 1,
+ "descripcion": "Peg_Apagado (apagado, z 0,5, escala x 2) en la cadena de un READ: la regla R7 cuenta su Z y su matriz.",
+ "origen": "paridad",
+ "origen_por_bloque": {
+  "grafo": "regla",
+  "atributos": "regla",
+  "evaluacion": "paridad",
+  "medicion": "harmony"
+ },
+ "medicion": {
+  "estado": "medido",
+  "origen": "harmony",
+  "version_harmony": "24.0.2 build 23443",
+  "fecha": "2026-11-12",
+  "metodo": "medido en Harmony 24 (-batch) sobre una copia de una escena vacia creada por el usuario, a la que se le inserto el contenido del caso editando su XML; la firma de la escena del usuario se conserva sin tocar. Lectura: getMatrix por nodo y atributo DRAWING; render solo en los casos de apagado",
+  "metricas": [
+   4,
+   3,
+   24,
+   24,
+   12
+  ],
+  "K": [
+   0.1111111111111111,
+   0.08333333333333333,
+   0.2222222222222222
+  ],
+  "error_lectura": {
+   "matriz_campos_xy": 5.1e-06,
+   "z_campos": 6.866455078125e-05,
+   "nota": "xy: error de lectura de getMatrix en espacio de matriz; z cuantizada a 1/65536 en espacio de matriz"
+  },
+  "unidades": "matriz y z en campos: F = D^-1 M D con D = diag(KX,KY,KZ,1); matriz = [[a,b,tx],[c,d,ty]]",
+  "nodos": {
+   "Top/Peg_Apagado": {
+    "tipo": "PEG",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "apagado": true,
+      "apagado_efectivo": true,
+      "dif_vs_esperado_matriz": 1.0,
+      "dif_posicion_vs_canales": 0.5,
+      "dif_vs_esperado_z": 0.5
+     },
+     "24": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "apagado": true,
+      "apagado_efectivo": true,
+      "dif_vs_esperado_matriz": 1.0,
+      "dif_posicion_vs_canales": 0.5,
+      "dif_vs_esperado_z": 0.5
+     }
+    }
+   },
+   "Top/Peg_Hijo": {
+    "tipo": "PEG",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.2500076,
+      "error_vs_modelo_harmony": 1.7e-06,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 1.0,
+      "dif_vs_esperado_z": 0.4999924
+     },
+     "24": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.2500076,
+      "error_vs_modelo_harmony": 1.7e-06,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 1.0,
+      "dif_vs_esperado_z": 0.4999924
+     }
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.2500076,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 1.7e-06,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 1.0,
+      "dif_vs_esperado_z": 0.4999924,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     },
+     "24": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.2500076,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 1.7e-06,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 1.0,
+      "dif_vs_esperado_z": 0.4999924,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     }
+    }
+   }
+  },
+  "se_dibuja": {
+   "render": "1920x1080, 60 px/campo en x y 45 en y, cuadro 1",
+   "manchas_tal_cual": 1,
+   "manchas_todo_encendido": 2,
+   "nodos": {
+    "Top/Dibujo_A": {
+     "se_dibuja": true,
+     "con_todo_encendido": true,
+     "apagado_efectivo_esperado": false,
+     "coincide_con_apagado_efectivo": true
+    }
+   },
+   "ancho_px_tal_cual": 141,
+   "ancho_px_todo_encendido": [
+    177,
+    115
+   ],
+   "extension_x_px_todo_encendido": 286.79999999999995
+  },
+  "reinterpretacion_al_guardar": {
+   "nodos_antes": 5,
+   "nodos_despues": 5,
+   "cables_antes": 4,
+   "cables_despues": 4,
+   "diferencias": []
+  },
+  "discrepancias_con_regla_paridad": [
+   "f1 Top/Peg_Apagado: matriz medida [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]] vs compatibilidad [[2.0, 0.0, 0.0], [0.0, 1.0, 0.0]] (dif 1)",
+   "f1 Top/Peg_Apagado: posicion medida (0.0000, 0.0000, 0.0000) vs canales (0.0, 0.0, 0.5) [regla] (dif 0.5)",
+   "f1 Top/Peg_Apagado: z medida 0.0 vs compatibilidad 0.5 (dif 0.5)",
+   "f24 Top/Peg_Apagado: matriz medida [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]] vs compatibilidad [[2.0, 0.0, 0.0], [0.0, 1.0, 0.0]] (dif 1)",
+   "f24 Top/Peg_Apagado: posicion medida (0.0000, 0.0000, 0.0000) vs canales (0.0, 0.0, 0.5) [regla] (dif 0.5)",
+   "f24 Top/Peg_Apagado: z medida 0.0 vs compatibilidad 0.5 (dif 0.5)",
+   "f1 Top/Peg_Hijo: matriz medida [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]] vs compatibilidad [[2.0, 0.0, 0.0], [0.0, 1.0, 0.0]] (dif 1)",
+   "f1 Top/Peg_Hijo: z medida 0.2500076 vs compatibilidad 0.75 (dif 0.5)",
+   "f24 Top/Peg_Hijo: matriz medida [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]] vs compatibilidad [[2.0, 0.0, 0.0], [0.0, 1.0, 0.0]] (dif 1)",
+   "f24 Top/Peg_Hijo: z medida 0.2500076 vs compatibilidad 0.75 (dif 0.5)",
+   "f1 Top/Dibujo_A: matriz medida [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]] vs compatibilidad [[2.0, 0.0, 0.0], [0.0, 1.0, 0.0]] (dif 1)",
+   "f1 Top/Dibujo_A: z medida 0.2500076 vs compatibilidad 0.75 (dif 0.5)",
+   "f24 Top/Dibujo_A: matriz medida [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]] vs compatibilidad [[2.0, 0.0, 0.0], [0.0, 1.0, 0.0]] (dif 1)",
+   "f24 Top/Dibujo_A: z medida 0.2500076 vs compatibilidad 0.75 (dif 0.5)"
+  ],
+  "notas": [
+   "A4-01 confirmada: el PEG con marca propia es identidad (matriz identidad, z 0). La Z de la cadena es 0,25 (solo Peg_Hijo) y la escala x 2 no se aplica; el modo de compatibilidad (R7, apagados incluidos) da 0,75 y escala 2. El READ se dibuja (render: 1 mancha de 141 px de ancho; con el PEG encendido la mancha se ensancha y se parte en 2)."
+  ]
+ },
+ "escena": {
+  "fotogramas": 24,
+  "fps": 24
+ },
+ "nodos": [
+  {
+   "ruta": "Top/Peg_Apagado",
+   "tipo": "PEG",
+   "nombre": "Peg_Apagado",
+   "padre": null,
+   "apagado": true,
+   "apagado_efectivo": true
+  },
+  {
+   "ruta": "Top/Peg_Hijo",
+   "tipo": "PEG",
+   "nombre": "Peg_Hijo",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Dibujo_A",
+   "tipo": "READ",
+   "nombre": "Dibujo_A",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Composite",
+   "tipo": "COMPOSITE",
+   "nombre": "Composite",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pantalla",
+   "tipo": "DISPLAY",
+   "nombre": "Pantalla",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  }
+ ],
+ "cables_literales": [
+  [
+   "Top",
+   "Top/Peg_Apagado",
+   0,
+   "Top/Peg_Hijo",
+   0
+  ],
+  [
+   "Top",
+   "Top/Peg_Hijo",
+   0,
+   "Top/Dibujo_A",
+   0
+  ],
+  [
+   "Top",
+   "Top/Dibujo_A",
+   0,
+   "Top/Composite",
+   0
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Pantalla",
+   0
+  ]
+ ],
+ "fuentes": {
+  "Top/Peg_Hijo": {
+   "0": [
+    [
+     "Top/Peg_Apagado",
+     0
+    ]
+   ]
+  },
+  "Top/Dibujo_A": {
+   "0": [
+    [
+     "Top/Peg_Hijo",
+     0
+    ]
+   ]
+  },
+  "Top/Composite": {
+   "0": [
+    [
+     "Top/Dibujo_A",
+     0
+    ]
+   ]
+  },
+  "Top/Pantalla": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  }
+ },
+ "puertos_composite": {
+  "Top/Composite": [
+   0
+  ]
+ },
+ "atributos": {},
+ "evaluacion": {
+  "1": {
+   "Top/Peg_Apagado": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": true,
+    "apagado_efectivo": true,
+    "cadena": [
+     "Top/Peg_Apagado"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 2.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.5
+    },
+    "z": 0.5,
+    "matriz": [
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Peg_Hijo": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_Hijo",
+     "Top/Peg_Apagado"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.25
+    },
+    "z": 0.75,
+    "matriz": [
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_Hijo",
+     "Top/Peg_Apagado"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 0.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.75,
+    "matriz": [
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  },
+  "24": {
+   "Top/Peg_Apagado": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": true,
+    "apagado_efectivo": true,
+    "cadena": [
+     "Top/Peg_Apagado"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 2.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.5
+    },
+    "z": 0.5,
+    "matriz": [
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Peg_Hijo": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_Hijo",
+     "Top/Peg_Apagado"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.25
+    },
+    "z": 0.75,
+    "matriz": [
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_Hijo",
+     "Top/Peg_Apagado"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 0.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.75,
+    "matriz": [
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  }
+ }
+}

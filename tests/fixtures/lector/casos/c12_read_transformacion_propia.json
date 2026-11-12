@@ -1,0 +1,22 @@
+{
+ "nombre": "c12_read_transformacion_propia",
+ "descripcion": "READ con transformacion propia (escala x 2, rotacion -90, offset z 0,25) bajo un PEG que gira 90.",
+ "fotogramas": 24,
+ "evaluar": [1],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-24", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_P", "attrs": {"rotation/anglez": 90}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {
+   "drawing/element": {"col": "Col_Dibujo"}, "scale/x": 2, "rotation/anglez": -90, "offset/z": 0.25}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_P", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

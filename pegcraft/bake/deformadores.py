@@ -12,7 +12,7 @@ Modelo (deducido de los atributos del .xstage y MEDIDO contra renders de Harmony
   Fuera de los extremos de una cadena abierta queda la extension rigida del extremo (INFINITE_INFLUENCE).
 Cadenas con varios deformadores (hijo bajo padre, p. ej. craneo bajo cuello): grupos() los separa y Deformador los compone (el de reposo se ignora).
 No cubre: radios de influencia (transversal/longitudinal), localreferential, orientacion del Offset distinta de 0 con cadenas hijas,
-Deformation-Composite, PointConstraint2.
+DeformationCompositeModule, PointConstraint2.
 VARIANTE (env PEGCRAFT_DEF_VAR, letras; def. ninguna): 'i' = asa isotropa (sin A en x), peor medido;
                                           'o' = en una envolvente cerrada el inicio/cierre es el `offset` del ultimo Curve y no el del Offset.
 """

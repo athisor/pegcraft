@@ -1,0 +1,25 @@
+{
+ "nombre": "c17_peg_traslacion_pivote",
+ "descripcion": "Dos cadenas: Peg_Traslacion (posicion 3, -1,5, 0,5; sin giro) y Peg_Pivote (posicion 1, 0,5; pivote 1, 2; rotacion 30; escala 2, 3). Fija la unidad de la traslacion y del pivote de la matriz.",
+ "fotogramas": 12,
+ "evaluar": [1, 12],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-12", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_Traslacion", "attrs": {"position/x": 3, "position/y": -1.5, "position/z": 0.5}},
+  {"tipo": "PEG", "nombre": "Peg_Pivote", "attrs": {"position/x": 1, "position/y": 0.5, "pivot/x": 1, "pivot/y": 2, "rotation/anglez": 30, "scale/x": 2, "scale/y": 3}},
+  {"tipo": "READ", "nombre": "Dibujo_T", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "READ", "nombre": "Dibujo_P", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_Traslacion", "destino": "Dibujo_T"},
+  {"origen": "Peg_Pivote", "destino": "Dibujo_P"},
+  {"origen": "Dibujo_T", "destino": "Composite", "puerto_destino": 0},
+  {"origen": "Dibujo_P", "destino": "Composite", "puerto_destino": 1},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}
