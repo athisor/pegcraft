@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pegcraft"
+version = "0.0.1"
+description = "Renderer abierto de escenas Harmony (subconjunto cutout): lectura de .xstage/.tvg/.plt, horneado y rasterizado"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT OR Apache-2.0"
+license-files = ["LICENSE-MIT", "LICENSE-APACHE"]
+dependencies = [
+    "numpy",
+    "Pillow",
+]
+
+[project.optional-dependencies]
+# safetensors: compilar escena -> plano (pegcraft/compilar, pegcraft/planofmt)
+compilar = ["safetensors"]
+# scipy: metricas de bordes (pegcraft/medir/bordes.py)
+medir = ["scipy"]
+todo = ["safetensors", "scipy"]
+
+[project.scripts]
+pegcraft = "pegcraft.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["pegcraft*", "sightread*"]   # sightread/ es un git subtree (ver sightread/README.md)
+exclude = ["sightread.tests*"]
