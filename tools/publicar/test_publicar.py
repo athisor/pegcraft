@@ -12,7 +12,7 @@ def repo(archivos):
     d = Path(tempfile.mkdtemp())
     subprocess.run(["git", "-C", str(d), "init", "-q", "-b", "main"], check=True)
     for rel, txt in archivos.items():
-        p = d / rel; p.parent.mkdir(parents=True, exist_ok=True); p.write_text(txt, encoding="utf-8")
+        p = d / rel; p.parent.mkdir(parents=True, exist_ok=True); p.write_bytes(txt if isinstance(txt, bytes) else txt.encode("utf-8"))
     subprocess.run(["git", "-C", str(d), "add", "-A"], check=True)
     subprocess.run(GIT + ["-C", str(d), "commit", "-q", "-m", "x"], check=True)
     return d
@@ -133,11 +133,30 @@ class TestFixtures(unittest.TestCase):
             cod, dest = self.publicar({FIXT + "a.xstage": txt})
             self.assertEqual(cod, 2, nombre)
 
+    def test_tvg_sintetico_en_ejemplos(self):
+        """Un .tvg sin CERT ni firma se admite solo en las rutas de fixtures; uno con CERT o SIGN, o fuera de ellas, se detiene."""
+        ej = "ejemplos/escena_minima/"
+        limpio = b"OTVGfull" + bytes(40)
+        cod, dest = self.publicar_ej({ej + "e/a.tvg": limpio})
+        self.assertEqual(cod, 0)
+        self.assertTrue((dest / ej / "e" / "a.tvg").exists())
+        for malo in (limpio + b"CERT", limpio + b"SIGN"):
+            cod, _ = self.publicar_ej({ej + "e/a.tvg": malo})
+            self.assertEqual(cod, 2)
+        cod, _ = self.publicar_ej({"ejemplos/otro/a.tvg": limpio})
+        self.assertEqual(cod, 2)
+
+    def publicar_ej(self, archivos):
+        o = repo(archivos)
+        dest = Path(tempfile.mkdtemp()) / "l"
+        cod = P.main(["--origen", str(o), "--destino", str(dest), "--permitidos", permitidos("ejemplos/"), "--fixtures", fixtures("ejemplos/escena_minima/")])
+        return cod, dest
+
     def test_archivos_del_repo_real_cumplen(self):
         """El ejemplo de prohibidos y los permitidos del repo se pueden leer; el ejemplo no contiene nombres reales."""
         aqui = Path(__file__).parent
         self.assertIn("docs/", P.leer_lista(aqui / "publicar.permitidos"))
-        self.assertEqual(P.leer_lista(aqui / "fixtures.permitidos"), [FIXT])
+        self.assertEqual(P.leer_lista(aqui / "fixtures.permitidos"), [FIXT, "ejemplos/escena_minima/"])
         for r in P.leer_regex(aqui / "prohibidos.local.txt.ejemplo"):
             self.assertRegex(r, r"(Ejemplo|EP99)")
 

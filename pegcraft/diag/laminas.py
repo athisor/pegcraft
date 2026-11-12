@@ -80,5 +80,5 @@ def zonas(ref, salida, renders, zonas):
     w = max(f.shape[1] for f in filas)
     filas = [np.pad(f, ((0, 6), (0, w - f.shape[1]), (0, 0)), constant_values=255) for f in filas]
     cv2.imwrite(str(salida), np.concatenate(filas, 0).astype(np.uint8))
-    json.dump(res, open(str(salida).rsplit(".", 1)[0] + ".json", "w"), indent=1)
+    json.dump(res, open(str(salida).rsplit(".", 1)[0] + ".json", "w", encoding="utf-8"), indent=1)
     return res

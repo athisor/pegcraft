@@ -2,3 +2,4 @@
 # publicar.py exige ahi: menos de 200 KB, sin checksumValidation, sin rutas absolutas y ningun nombre de prohibidos.local.txt.
 # Un .xstage en cualquier otra ruta sigue bloqueado por extension.
 tests/fixtures/lector/
+ejemplos/escena_minima/

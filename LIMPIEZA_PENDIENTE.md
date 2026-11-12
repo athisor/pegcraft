@@ -4,10 +4,9 @@ Este documento resume lo que falta para compilar y ejecutar pegcraft en una máq
 
 ## Dependencias externas que no están en este repositorio
 
-1. **Conversor `.tvg` → SVG.** `PEGCRAFT_TVG_DIR` apunta a la carpeta con sus módulos (`geometria`, `svg`, `plt_escena`, `plt_formato`). Es la única dependencia de código
-   externa del horneado: se usa en `bake/gradientes.py` (que también hace la conversión base de cada dibujo, `bake/hornear.convertir_tvg`) y en `compilar/almacen.py`.
-   Sin él, `python -m pegcraft hornear` y `compilar` no pueden convertir dibujos (las piezas se omiten con aviso). El lector de escenas `.xstage` ya es parte del
-   repositorio (`pegcraft/lector/`, con `pegcraft/lector/compat.py` como adaptador mínimo del horneado).
+1. **Lectores `.tvg` y `.plt`: resuelto.** Ya son del repositorio (`pegcraft/tvg/`, `pegcraft/plt/`, solo biblioteca estándar) y el horneado no depende de código externo.
+   Quedan sin cubrir (ver README, «Límites conocidos»): texto, texturas, `tGTI`/`TGRV`, formas F=4/5/6, y el degradado radial es un supuesto sin ejemplo medido.
+   La versión del lector entra en la clave del almacén de activos (`compilar/almacen.version_conversor`: hash de `pegcraft/tvg`, `pegcraft/plt` y `bake/gradientes.py`).
 2. **Forks `storytold` con `rev` fijo** (`egui`, `winit`, `craft-ui`) en `crates/pegcraft-viewer-craft/Cargo.toml`: dependen de GitHub; si una revisión desaparece, no compila.
    Falta `cargo vendor`. `cargo check --offline` pasó solo con la caché de cargo de la máquina de origen.
 3. **Visor:** `abrir.rs` asume que se ejecuta desde la raíz del repositorio y que `python` está en el PATH. No se ejecutó el visor tras anonimizar rutas.

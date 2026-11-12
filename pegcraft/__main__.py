@@ -1,6 +1,7 @@
 """CLI unica: python -m pegcraft <subcomando> ...   (ver (doc interna omitida)
 
   hornear         un fotograma -> escena.json + dibujos\\*.svg   (def.: conectores, matriz causal y deformadores = lo mejor validado)
+  ver             escena.xstage + fotograma -> PNG (hornea y dibuja de una vez)
   render          escena.json -> PNG con el crate pegcraft-render
   medir           px_ok / px_ok_personajes / (con --solo-ref --solo-mio) metrica de un grupo solo
   keyframes       fotogramas donde cambian los dibujos expuestos
@@ -49,6 +50,10 @@ def main(argv=None):
     h.add_argument("--gradientes", choices=["si", "no"], default="si", help="def. si (validado 11-11-2026). rellenos Gradient (Linear/Radial) como SVG <linearGradient>; el crate los dibuja (doc interna omitida)")
     h.add_argument("--opacidad", choices=["leer", "ignorar"], default="leer")
     h.add_argument("--glow-suma", choices=["si", "no"], default="si", help="def. si (validado 11-11-2026, PLANO +0,28..+0,39): marca mezcla=suma en las piezas cuya rama pasa por un GLOW aditivo; el crate las suma por canal. Sin GLOW no cambia nada")
+
+    v = sp.add_parser("ver", help="escena.xstage + fotograma -> PNG (hornea en una carpeta temporal y dibuja con pegcraft-render)")
+    v.add_argument("xstage"); v.add_argument("fotograma", type=int); v.add_argument("-o", "--out", required=True, help="PNG de salida")
+    v.add_argument("--bg", choices=["gris", "transparente"], default="gris")
 
     r = sp.add_parser("render", help="escena.json -> PNG")
     r.add_argument("escena"); r.add_argument("--out", required=True)
@@ -110,6 +115,9 @@ def main(argv=None):
                          z=a.z, apilado_modo=a.apilado, recortadas=a.recortadas, camara=a.camara, desfase=a.desfase, desfase_grupo=a.desfase_grupo,
                          carpeta=a.carpeta, opacidad=a.opacidad, matriz_causal=_si(a.causal), deformadores=_si(a.deformadores), gradientes=_si(a.gradientes), glow_suma=_si(a.glow_suma))
         print(json.dumps(res, ensure_ascii=False))
+    elif a.cmd == "ver":
+        from .ver import ver
+        print(ver(a.xstage, a.fotograma, a.out, a.bg))
     elif a.cmd == "render":
         from .medir.render import renderizar
         print(renderizar(a.escena, a.out, a.bg, a.extra))

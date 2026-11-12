@@ -13,6 +13,7 @@ from . import apilado
 from .. import config as _config
 from ..lector import compat as L
 from ..compilar import almacen as _alm
+from .. import rutas as _rutas
 
 CAMARAS = {
     "supuesta": {"cx": 960.0, "cy": 540.0, "sx": 60.0, "sy": 45.06},   # SUPUESTO: calibrado en PLANO
@@ -29,22 +30,25 @@ PERSP_ENV = _os.environ.get("PEGCRAFT_PERSP_D")
 
 
 def convertir_tvg(tvg, esc, svg, gradientes=True):
-    """.tvg -> SVG con el conversor .tvg externo (PEGCRAFT_TVG_DIR; el lector .xstage no interviene). Con `gradientes` los rellenos Gradient salen como
-    <linearGradient>/<radialGradient>; sin ellos el SVG es el del conversor oficial. Devuelve (error, info): `error` es None si convirtio o el texto del
-    error si no pudo (el conversor aborta con SystemExit en formas que no lee, p. ej. un .tvg «forma F=6»: el horneado omite SOLO esa pieza y avisa
-    TVG_ILEGIBLE); `info` es el resultado de bake/gradientes.convertir o None. Si falla solo el post-proceso de gradientes se reintenta sin el."""
+    """.tvg -> SVG con el lector `pegcraft.tvg` (el lector .xstage no interviene). Con `gradientes` los rellenos Gradient salen como
+    <linearGradient>/<radialGradient>. Devuelve (error, info): `error` es None si convirtio o el texto del error si no pudo (`TvgIlegible` en formas
+    que no lee, p. ej. un .tvg «forma F=6»: el horneado omite SOLO esa pieza y avisa TVG_ILEGIBLE); `info` es el resultado de
+    bake/gradientes.convertir o None. Si falla solo el post-proceso de gradientes se reintenta sin el."""
     from . import gradientes as _gr
+    from ..tvg import TvgIlegible
     info = None
     try:
         try:
             info = _gr.convertir(str(tvg), str(esc), str(svg), con_gradientes=gradientes)
-        except (Exception, SystemExit) as ex:
+        except TvgIlegible:
+            raise
+        except Exception as ex:
             if not gradientes:
                 raise
             info = {"gradientes": [], "avisos": [f"gradientes {Path(svg).name}: {ex}"]}
             _gr.convertir(str(tvg), str(esc), str(svg), con_gradientes=False)
         return None, info
-    except (Exception, SystemExit) as ex:
+    except Exception as ex:
         try:
             Path(svg).unlink()
         except OSError:
@@ -171,8 +175,11 @@ def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conec
         n = evd[ruta][1]
         carp = el[1] if (carpeta == "real" and el[1]) else el[0]
         tvg = esc / "elements" / carp / f"{el[0]}-{n['dibujo']}.tvg"
-        if not tvg.is_file():
-            avisos_glob.append(f"sin tvg {tvg.name} ({ruta})"); return None
+        if not tvg.is_file():     # el .xstage puede nombrar otra capitalizacion que el disco (Linux)
+            _t = _rutas.buscar(esc, "elements", carp, f"{el[0]}-{n['dibujo']}.tvg")
+            if _t is None or not _t.is_file():
+                avisos_glob.append(f"sin tvg {tvg.name} ({ruta})"); return None
+            tvg = _t
         svg = out / "dibujos" / (f"{el[0]}-{n['dibujo']}.svg" if carp == el[0] else f"{carp}-{n['dibujo']}.svg")
         if tvg.name in _ILEGIBLES:   # ya fallo en este cuadro: misma pieza omitida sin volver a leerlo
             avisos_glob.append(f"TVG_ILEGIBLE {tvg.name} ({ruta}): {_ILEGIBLES[tvg.name]}; pieza omitida"); return None
@@ -188,7 +195,7 @@ def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conec
                 if _err:
                     _ILEGIBLES[tvg.name] = _err
                     avisos_glob.append(f"TVG_ILEGIBLE {tvg.name} ({ruta}): {_err}; pieza omitida"); return None
-                if gradientes and r_g:   # rellenos Gradient como <linearGradient> (bake/gradientes.py); sin ellos, el SVG del conversor oficial
+                if gradientes and r_g:   # rellenos Gradient como <linearGradient> (bake/gradientes.py); sin ellos, el SVG base del lector .tvg
                     if r_g["gradientes"]:
                         GRADS[svg.name] = [g["nombre"] for g in r_g["gradientes"]]
                     avisos_glob.extend(f"{svg.name}: {a_}" for a_ in r_g["avisos"])
@@ -258,8 +265,9 @@ def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conec
     if gradientes:
         meta["dibujos_con_gradiente"] = GRADS
     ruta_json = out / nombre
-    json.dump({"version": 2 if conectores else 1, "escena": xs, "fotograma": f, "camara": CAM, "tamano": [1920, 1080],
-               "avisos": avisos_glob, "apilado": meta, "piezas": piezas}, open(ruta_json, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+    with open(ruta_json, "w", encoding="utf-8") as fh:
+        json.dump({"version": 2 if conectores else 1, "escena": xs, "fotograma": f, "camara": CAM, "tamano": [1920, 1080],
+                   "avisos": avisos_glob, "apilado": meta, "piezas": piezas}, fh, indent=1, ensure_ascii=False)
     resumen = {"json": str(ruta_json), "piezas": len(piezas), "con_recorte": sum(1 for p in piezas if p.get("recorte")),
                "omitidas": omitidas, "deformadas": len(DEFORMADAS), "avisos": len(avisos_glob)}
     return str(ruta_json), resumen

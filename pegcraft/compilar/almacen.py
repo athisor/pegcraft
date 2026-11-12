@@ -2,7 +2,7 @@
 
 Clave de un dibujo base  = sha256( sha256(.tvg) | hash de paletas visibles | VERSION_CONVERSOR | flag gradientes ).
 Clave de un dibujo deformado = sha256( clave base | estado del deformador (nodos activos, aspecto, div, variante) ).
-El almacen solo guarda SVG que ya produce el conversor (hornear los copia a su carpeta de salida: la salida de `hornear` no cambia).
+El almacen solo guarda SVG que ya produce el lector .tvg (hornear los copia a su carpeta de salida: la salida de `hornear` no cambia).
 Desactivar: env PEGCRAFT_ALMACEN=no.
 """
 import hashlib, json, os, shutil, time
@@ -11,7 +11,7 @@ from ..config import RAIZ
 
 RAIZ_ALMACEN = Path(os.environ.get("PEGCRAFT_CACHE_SVG", str(RAIZ / "cache" / "svg")))
 ACTIVO = os.environ.get("PEGCRAFT_ALMACEN", "si") != "no"
-CONVERSOR = Path(os.environ.get("PEGCRAFT_TVG_DIR", ""))   # lector .tvg externo (ver LIMPIEZA_PENDIENTE.md)
+PAQUETE = Path(__file__).resolve().parents[1]   # carpeta pegcraft/
 ESQUEMA = "1"          # subir si cambia el formato de clave
 
 STATS = {"hit": 0, "miss": 0, "hit_def": 0, "miss_def": 0, "t_convertir": 0.0, "t_deformar": 0.0, "t_copiar": 0.0, "t_clave": 0.0}
@@ -32,13 +32,14 @@ def sha_archivo(p):
 
 
 def version_conversor():
-    """Hash del codigo del conversor oficial (tvg/*.py) + post-proceso de gradientes (cambia el codigo => cambia toda la clave)."""
+    """Hash del codigo del lector .tvg (pegcraft/tvg/*.py), del lector .plt (pegcraft/plt/*.py) y del post-proceso de gradientes
+    (cambia el codigo => cambia toda la clave)."""
     if "ver" not in _memo:
         h = hashlib.sha256(ESQUEMA.encode())
-        fs = sorted(CONVERSOR.glob("*.py")) + [Path(__file__).resolve().parents[1] / "bake" / "gradientes.py"]
+        fs = sorted((PAQUETE / "tvg").glob("*.py")) + sorted((PAQUETE / "plt").glob("*.py")) + [PAQUETE / "bake" / "gradientes.py"]
         for f in fs:
             if f.is_file():
-                h.update(f.name.encode()); h.update(f.read_bytes())
+                h.update(f.parent.name.encode()); h.update(f.name.encode()); h.update(f.read_bytes())
         _memo["ver"] = h.hexdigest()[:16]
     return _memo["ver"]
 

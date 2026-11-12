@@ -14,12 +14,36 @@ pensado como base de un clon limpio del subconjunto *cutout* de ese formato.
 - `pegcraft/` — paquete Python: horneado de un fotograma (`bake`), compilador de escena a «plano» (`compilar`),
   deformadores, medición de imágenes y utilidades.
   El lector de escenas `.xstage` (grafo, columnas, evaluación) vive en `pegcraft/lector/`; el horneado lo usa a través de `pegcraft/lector/compat.py`.
-  El conversor `.tvg` → SVG es externo (`PEGCRAFT_TVG_DIR`). Configuración de producción por entorno: `PEGCRAFT_EXCLUIR`, `PEGCRAFT_Z_EXCEPCIONES`.
+  Los lectores de dibujos `.tvg` (`pegcraft/tvg/`) y de paletas `.plt` (`pegcraft/plt/`) también son del repositorio, solo con biblioteca estándar.
+  Configuración de producción por entorno: `PEGCRAFT_EXCLUIR`, `PEGCRAFT_Z_EXCEPCIONES`.
 - `crates/pegcraft-render` — rasterizador CPU (kurbo + tiny-skia) que dibuja el `escena.json` horneado.
 - `crates/pegcraft-gpu` — spike de rasterizado por GPU (vello sobre wgpu).
 - `crates/pegcraft-viewer`, `crates/pegcraft-viewer-craft` — visores de prueba (egui).
 - `tests/` — pruebas unitarias sintéticas; las que necesitan escenas reales se omiten solas.
 - `scripts/` — envoltorios finos de la CLI.
+
+## Instalación y primer render
+
+Requiere Python 3.11 o más nuevo y Rust (`cargo`). No hace falta ninguna variable `PEGCRAFT_*`.
+
+```
+pip install -e .
+cargo build --release --manifest-path crates/pegcraft-render/Cargo.toml
+pegcraft ver ejemplos/escena_minima/escena.xstage 1 -o salida.png
+```
+
+`pegcraft ver <escena.xstage> <fotograma> -o salida.png` hornea el fotograma a una carpeta temporal y lo dibuja con el rasterizador CPU. Si falta el binario, dice el
+comando para compilarlo. Dependencias: `numpy` y `Pillow`; extras opcionales: `pip install -e .[compilar]` (safetensors) y `.[medir]` (scipy).
+
+## Límites conocidos del lector de dibujos y paletas
+
+- Fuera de alcance: texto, texturas (se reconocen y no se dibujan), registros `tGTI`/`TGRV` y las formas F=4, 5 y 6 (el dibujo da `TvgIlegible` y el horneado omite
+  esa pieza con aviso `TVG_ILEGIBLE`).
+- El lápiz con perfil de grosor variable se dibuja como polígono solo cuando el perfil se entiende; si no, cae a ancho constante con aviso.
+- Degradados: el radial es un supuesto (centro 0, radio 0,5 en el espacio del degradado) sin ejemplo medido; la matriz sale del registro TGCO del trazo.
+- Paletas: se carga `palette-library/<clave>.plt` local; el destino absoluto de `PALETTE_LIST` se ignora y lo no declarado no se carga. Las claves `../../palette-library/<n>`
+  se resuelven literalmente (sin probar en Harmony). La paleta de la escena gana sobre la copia local del dibujo.
+- Las búsquedas de archivos (`elements/…/*.tvg`, `palette-library`) prueban el nombre exacto y luego sin distinguir mayúsculas, para sistemas de archivos que las distinguen.
 
 ## El lector de escenas `.xstage`
 
@@ -49,7 +73,7 @@ Pruebas: `python -I -m unittest discover -s tests -p "test_*.py"`.
 
 ## Qué falta (resumen honesto)
 
-- El lector de `.xstage` es parte del repositorio (`pegcraft/lector/`). El conversor `.tvg` → SVG **no está** (dependencia externa, `PEGCRAFT_TVG_DIR`).
+- Los lectores de `.xstage`, `.tvg` y `.plt` son parte del repositorio (`pegcraft/lector/`, `pegcraft/tvg/`, `pegcraft/plt/`); ya no hay dependencia externa de código.
 - No hay escenas de producción de ejemplo; las pruebas del horneado usan casos sintéticos (`tests/fixtures/lector/casos/`) y las que necesitan una escena propia se omiten solas.
 - Licencia `MIT OR Apache-2.0` (`LICENSE-MIT`, `LICENSE-APACHE`, `NOTICE`); procedencia de lo consultado en `ATTRIBUTION.md`.
 - No se ha probado la compilación ni la instalación fuera del equipo de origen. Detalle en `LIMPIEZA_PENDIENTE.md`.

@@ -48,5 +48,5 @@ def main(ref, mio, sil=None, salida_json=None):
     r = metricas(ref, mio, sil)
     print(json.dumps(r))
     if salida_json:
-        json.dump(r, open(salida_json, "w"), indent=1)
+        json.dump(r, open(salida_json, "w", encoding="utf-8"), indent=1)
     return r

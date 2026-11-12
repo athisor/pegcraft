@@ -119,7 +119,7 @@ def main(xs, f, patron=".", salida=None):
     """Imprime los READ con deformadores activos; con `salida` escribe el censo JSON."""
     out = censo(xs, f, patron)
     if salida:
-        json.dump(out, open(salida, "w"), indent=1)
+        json.dump(out, open(salida, "w", encoding="utf-8"), indent=1)
     for r, cad in out.items():
         ds = [c for c in cad if c["tipo"] in ("OffsetModule", "CurveModule")]
         if ds:

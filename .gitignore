@@ -11,3 +11,5 @@ __pycache__/
 cache/
 banco_pnp/
 prohibidos.local.txt
+!ejemplos/**/*.tvg
+!ejemplos/**/*.xstage

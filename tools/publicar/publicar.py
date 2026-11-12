@@ -34,7 +34,7 @@ EXT_BLOQUEADAS = {".xstage", ".tvg", ".safetensors", ".sqlite", ".db", ".zip", "
                   ".psd", ".plt", ".sboard", ".sbpz", ".env", ".pem", ".key", ".pfx"}
 EXT_TEXTO = {".py", ".rs", ".toml", ".md", ".txt", ".json", ".yml", ".yaml", ".ps1", ".cmd", ".sh", ".cfg", ".ini", ".html", ".css", ".js",
              ".svg", ".lock", ".gitignore", ".permitidos", ".ejemplo", ".xml", ".gitattributes", ""}
-EXT_FIXTURE = {".xstage"}                     # unica extension bloqueada que puede admitirse, solo en las rutas de fixtures.permitidos
+EXT_FIXTURE = {".xstage", ".plt", ".tvg", ".png"}   # bloqueadas o binarias que se admiten solo en las rutas de fixtures.permitidos (.tvg: sin CERT ni firma; .png: imagen esperada de un ejemplo)
 MAX_BYTES = 1_500_000
 MAX_FIXTURE = 200_000
 IGNORAR_LINEA = "publicar: permitir"          # comentario en la linea para excepciones revisadas a mano
@@ -96,6 +96,22 @@ def escanear(raiz, rutas, prohibidos=(), fixtures=()):
         for n in nombres:                                   # nombres tambien en la RUTA
             if n.search(rel):
                 hallazgos.append((rel, 0, "nombre_en_ruta"))
+        if es_fixture and ext == ".tvg":                    # binario SINTETICO: ni certificado ni firma de Harmony, ni nombres prohibidos
+            datos = p.read_bytes()
+            if b"CERT" in datos or b"SIGN" in datos:
+                hallazgos.append((rel, 0, "tvg_firmado"))
+            txt = datos.decode("latin-1")
+            for n in nombres:
+                if n.search(txt):
+                    hallazgos.append((rel, 0, "nombre"))
+            continue
+        if es_fixture and ext == ".png":                    # imagen esperada de un ejemplo: PNG real y sin metadatos de texto
+            datos = p.read_bytes()
+            if not datos.startswith(b"\x89PNG\r\n\x1a\n"):
+                hallazgos.append((rel, 0, "png_invalido"))
+            if any(t in datos for t in (b"tEXt", b"iTXt", b"zTXt", b"eXIf")):
+                hallazgos.append((rel, 0, "png_con_metadatos"))
+            continue
         if ext not in EXT_TEXTO and not es_fixture:
             hallazgos.append((rel, 0, "tipo_desconocido")); continue
         try:

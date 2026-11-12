@@ -1,13 +1,16 @@
-"""Llamadas al crate pegcraft-render (el binario se compila aparte: cargo build --release --offline)."""
+"""Llamadas al crate pegcraft-render (el binario se compila aparte: cargo build --release --manifest-path crates/pegcraft-render/Cargo.toml)."""
 import json, subprocess
 from pathlib import Path
 from ..config import EXE
+
+AVISO_SIN_BINARIO = ("falta el rasterizador {exe}. Compilalo desde la raiz del repositorio con: "
+                     "cargo build --release --manifest-path crates/pegcraft-render/Cargo.toml  (o apunta PEGCRAFT_EXE a un binario existente)")
 
 
 def renderizar(escena_json, png, bg="gris", extra=()):
     """Renderiza un escena.json a png (RGBA 1920x1080). bg: 'gris' o 'transparente'. extra: flags del crate (--div, --sin-recorte...)."""
     if not Path(EXE).is_file():
-        raise SystemExit(f"falta {EXE}: cd crates\\pegcraft-render; cargo build --release --offline")
+        raise SystemExit(AVISO_SIN_BINARIO.format(exe=EXE))
     cmd = [str(EXE), str(escena_json), "--out", str(png), *extra]
     if bg == "transparente":
         cmd += ["--bg", "transparente"]

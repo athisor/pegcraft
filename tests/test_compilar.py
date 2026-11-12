@@ -4,6 +4,10 @@ import json, sys, tempfile, unittest, shutil
 from pathlib import Path
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+try:
+    import safetensors  # noqa: F401  (extra opcional: pip install -e .[compilar])
+except ImportError:
+    raise unittest.SkipTest("falta el extra opcional 'compilar' (safetensors): pip install -e .[compilar]")
 from pegcraft.compilar import almacen, plano
 from pegcraft.config import XSTAGE_PRUEBA
 

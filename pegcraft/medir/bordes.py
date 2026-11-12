@@ -44,4 +44,4 @@ if __name__ == "__main__":
     out = descomponer(a[0], a[1], opt("--sil"))
     print(json.dumps(out, indent=1))
     if opt("--json"):
-        json.dump(out, open(opt("--json"), "w"), indent=1)
+        json.dump(out, open(opt("--json"), "w", encoding="utf-8"), indent=1)

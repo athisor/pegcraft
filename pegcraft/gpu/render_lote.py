@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 
 RAIZ = Path(__file__).resolve().parents[2]
-GPU_EXE = RAIZ / "crates" / "pegcraft-gpu" / "target" / "release" / "pegcraft-gpu.exe"
+GPU_EXE = RAIZ / "crates" / "pegcraft-gpu" / "target" / "release" / "pegcraft-gpu" + (".exe" if sys.platform == "win32" else "")
 FLAGS = "--ss 2 --aa-gauss 0.45 --opacidad-grupo"
 
 
@@ -96,8 +96,8 @@ def main(argv=None):
     if a.ambos:
         f = comparar(out / "cpu", out / "gpu", nombres)
         res["comparacion"] = {"max": max(x["max"] for x in f), "pct_distintos_medio": round(sum(x["pct_distintos"] for x in f) / len(f), 4), "pct_mayor_24_medio": round(sum(x["pct_mayor_24"] for x in f) / len(f), 4)}
-        json.dump(f, open(out / "comparacion.json", "w"), indent=1)
-    json.dump(res, open(out / "resumen_lote.json", "w"), indent=1)
+        json.dump(f, open(out / "comparacion.json", "w", encoding="utf-8"), indent=1)
+    json.dump(res, open(out / "resumen_lote.json", "w", encoding="utf-8"), indent=1)
     print(json.dumps(res, indent=1))
 
 

@@ -60,5 +60,5 @@ def solos(escena_json, carpeta_solo, salida, pares, fotograma=22, capas=None, si
             r.update(contorno(A, B)); r["ecc"] = ecc(A, B)
         res[est] = r
         print(est, json.dumps(r))
-    json.dump(res, open(os.path.join(salida, "resumen.json"), "w"), indent=1)
+    json.dump(res, open(os.path.join(salida, "resumen.json"), "w", encoding="utf-8"), indent=1)
     return res
