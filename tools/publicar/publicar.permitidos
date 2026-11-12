@@ -1,0 +1,14 @@
+# Rutas que SI se publican (prefijo de carpeta con "/" final, archivo exacto o patron). Todo lo demas se queda en el repo de desarrollo.
+pegcraft/
+crates/
+scripts/
+tests/
+tools/publicar/
+README.md
+LICENSE
+LICENSE-MIT
+LICENSE-APACHE
+NOTICE
+LIMPIEZA_PENDIENTE.md
+.gitignore
+ATTRIBUTION.md

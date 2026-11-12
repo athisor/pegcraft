@@ -1,0 +1,31 @@
+pegcraft
+Copyright (c) 2026 the pegcraft contributors.
+Licensed under the MIT License or the Apache License, Version 2.0, at your option
+(LICENSE-MIT, LICENSE-APACHE).
+
+Independence and trademarks
+
+pegcraft is an independent, clean-room project. It is not affiliated with, endorsed by or
+derived from Toon Boom Animation Inc. or its products. Product names such as Harmony are
+trademarks of their owners and are used only to say which file format this project reads.
+Its behaviour is learned from scene files and from comparing renders, not from proprietary
+code, documentation, assets or the contents of any installation.
+
+ArtCraft family
+
+The viewer builds on libraries of the ArtCraft family (craft-ui and craft-libs, fetched from
+https://github.com/storytold/craft-libs with a pinned revision), which are licensed
+MIT OR Apache-2.0. Their copyright belongs to their authors. The names ArtCraft and AniCraft
+and the ArtCraft logos and brand assets are NOT covered by those licences and are not used
+or distributed here.
+
+Parts of crates/pegcraft-viewer-craft/Cargo.toml (the [patch.crates-io] block) and of its
+Cargo.lock come from FilmCraft, Copyright (c) 2026 ArtCraft Team and the FilmCraft
+contributors, licensed MIT OR Apache-2.0. See ATTRIBUTION.md for what was used, observed,
+copied or left out, package by package.
+
+Third-party dependencies
+
+Rust and Python dependencies keep their own licences (see each Cargo.toml and lock file).
+Fonts and icons are not bundled; the icons are drawn in code. If an icon set or font is added
+later, add its author, source and licence to an ATTRIBUTION file at the same time.

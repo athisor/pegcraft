@@ -1,0 +1,10 @@
+[package]
+name = "pegcraft-render"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+kurbo = "0.13"
+tiny-skia = "0.12"
+serde_json = "1"
+roxmltree = "0.21"

@@ -1,0 +1,13 @@
+trabajo/
+banco/
+target/
+*.rar
+*.xstage
+*.tvg
+# Derivados de arte de produccion (SVG de dibujos de personajes/fondos): no se versionan
+bake/*/dibujos/
+__pycache__/
+*.pyc
+cache/
+banco_pnp/
+prohibidos.local.txt

@@ -1,0 +1,44 @@
+# PROVENANCE: the `[patch.crates-io]` block at the end of this file (the git URLs and pinned revisions of the egui/winit forks, and the
+# comment line above it) was copied from the root Cargo.toml of FilmCraft (https://github.com/storytold/filmcraft),
+# Copyright (c) 2026 ArtCraft Team and the FilmCraft contributors, licensed MIT OR Apache-2.0. Cargo.lock was seeded from FilmCraft's.
+# See ATTRIBUTION.md.
+[package]
+name = "pegcraft-viewer-craft"
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.95"
+description = "Visor de escenas Harmony horneadas alineado con la familia Craft (eframe 0.37 + fork storytold/egui + craft-ui)."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# Misma pila que FilmCraft/EffectCraft/MaterialCraft (Cargo.toml raiz de storytold/filmcraft @ main, 11-11-2026): egui/eframe 0.37 sobre el fork storytold/egui por [patch],
+# craft-ui y craft-libs por git con rev fijo. El Cargo.lock se sembro con el de FilmCraft para heredar sus versiones resueltas.
+egui = { version = "0.37", features = ["default_fonts"] }
+eframe = { version = "0.37", default-features = false, features = ["default_fonts", "wgpu"] }
+craft-ui = { git = "https://github.com/storytold/craft-libs", rev = "6e03f65bf45181db77ba6229716e6624db9eb25b", features = ["serde", "system_fonts"] }
+rfd = "0.17" # selector de archivos nativo (Abrir escena); ya estaba en el lock de otro proyecto
+kurbo = "0.13"
+tiny-skia = "0.12"
+serde_json = "1"
+roxmltree = "0.21"
+
+[profile.release]
+opt-level = 3
+
+# Keep the complete egui family and native event bridge on reviewed fork commits.
+[patch.crates-io]
+ecolor = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+emath = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+epaint = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+epaint_default_fonts = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui-winit = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui-wgpu = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_glow = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_extras = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_kittest = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_system_font_provider = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+eframe = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_demo_lib = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+egui_inspection = { git = "https://github.com/storytold/egui.git", rev = "6d518fc799681571963842f95b55a6b68431b15a" }
+winit = { git = "https://github.com/storytold/winit.git", rev = "a517b3846ee8457d84ee4975110bfda6797c44dc" }

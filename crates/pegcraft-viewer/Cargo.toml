@@ -1,0 +1,23 @@
+[package]
+name = "pegcraft-viewer"
+version = "0.0.1"
+edition = "2021"
+description = "Spike de visor para escenas Harmony horneadas (player, capas, parametros, nodos)."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# Misma pila y mismas versiones que otro proyecto.toml: egui 0.35 como biblioteca sobre un bucle winit propio (SIN eframe), wgpu 29.
+# El Cargo.lock se sembro con el de otro proyecto (eframe no resuelve offline: clipboard-win 5.4.1 esta retirada de crates.io).
+egui = "0.35"
+egui-winit = { version = "0.35", default-features = false }
+egui-wgpu = "0.35"
+winit = "0.30"
+pollster = "0.3"
+kurbo = "0.13"
+tiny-skia = "0.12"
+serde_json = "1"
+roxmltree = "0.21"
+
+[profile.release]
+opt-level = 3
+debug = false
