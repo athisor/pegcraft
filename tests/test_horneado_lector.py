@@ -214,6 +214,42 @@ class HornearSinTvg(unittest.TestCase):
         for p in j["piezas"]:
             self.assertAlmostEqual(p["z"], esp[p["id"]]["z"], delta=TOL)
 
+    def test_rango_igual_que_fotograma_a_fotograma(self):
+        """`hornear_rango` da el mismo escena.json que `hornear` por fotograma (salvo `../dibujos/` por `dibujos/`), convierte cada .tvg una vez y avisa por cada fotograma."""
+        from pegcraft.bake import rango
+        tmp = Path(tempfile.mkdtemp(prefix="hornear_test_"))
+        self.addCleanup(shutil.rmtree, tmp, True)
+        esc = tmp / "escena"
+        (esc / "elements" / "Dibujo_A").mkdir(parents=True)
+        for d in ("1", "2"):
+            (esc / "elements" / "Dibujo_A" / f"Dibujo_A-{d}.tvg").write_bytes(b"")
+        xs = esc / "c06.xstage"
+        shutil.copy(CASOS / "c06_composites_anidados.xstage", xs)
+        llamadas = []
+
+        def falso(tvg, esc_, svg, gradientes=True):
+            llamadas.append(Path(svg).name)
+            Path(svg).write_text("<svg/>", encoding="utf-8")
+            return None, None
+        avance = []
+        with mock.patch.object(H, "convertir_tvg", falso), mock.patch.object(almacen, "ACTIVO", False):
+            tot = rango.hornear_rango(str(xs), tmp / "rango", 1, 3, 1, avance=lambda i, n, f: avance.append((i, n, f)), gradientes=False)
+            n_rango = len(llamadas)
+            for f in (1, 2, 3):
+                H.hornear(str(xs), f, str(tmp / "uno" / f"f{f:04d}"), gradientes=False)
+        self.assertEqual(avance, [(1, 3, 1), (2, 3, 2), (3, 3, 3)])
+        self.assertEqual(tot["fotogramas"], 3)
+        self.assertEqual(n_rango, len(set(llamadas[:n_rango])))      # ningun SVG base convertido dos veces
+        for f in (1, 2, 3):
+            a = json.loads((tmp / "uno" / f"f{f:04d}" / "escena.json").read_text(encoding="utf-8"))
+            b = json.loads((tmp / "rango" / f"f{f:04d}" / "escena.json").read_text(encoding="utf-8"))
+            for p in b["piezas"]:
+                self.assertTrue(p["dibujo"].startswith("../dibujos/"))
+                self.assertTrue((tmp / "rango" / f"f{f:04d}" / p["dibujo"]).is_file())
+                p["dibujo"] = p["dibujo"].replace("../dibujos/", "dibujos/")
+            a["escena"] = b["escena"] = ""
+            self.assertEqual(a, b)
+
     def test_sin_tvg_avisa_y_omite(self):
         tmp = Path(tempfile.mkdtemp(prefix="hornear_test_"))
         self.addCleanup(shutil.rmtree, tmp, True)

@@ -243,6 +243,11 @@ def _constraints_pc2(g, ev, A, fotograma, eslabon, avisos):
                           float(t_el.find("y").get("val", 0)) if t_el is not None else 0.0, 1.0])
             return c[:2], (M @ c)[:2], M
         A0, Ac, M0 = piv(e0)
+        # padre o entrada con escala 0 (p. ej. un personaje escondido escalandolo a cero): la matriz no se invierte y lo que
+        # cuelga ya queda reducido a un punto (invisible), asi que el constraint no cambia nada visible: no se aplica y se avisa.
+        if abs(np.linalg.det(Mp)) < 1e-12 or abs(np.linalg.det(M0)) < 1e-12:
+            raros.append(f"{pc} (cadena con escala 0: no se aplica)")
+            continue
         B0, Bc, _ = piv(e1)
         L0, Lc = np.linalg.norm(B0 - A0), np.linalg.norm(Bc - Ac)
         if L0 < 1e-9 or Lc < 1e-9:

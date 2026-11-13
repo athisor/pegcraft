@@ -17,7 +17,7 @@ def rango(spec, xs):
 
 
 def compilar(xs, frames, salida, conservar_horneado=False, residual=True, depurar_personal=False, **kw):
-    """Hornea el rango compartiendo la escena abierta (cache de pegcraft.lector) y el almacen de activos, y escribe el plano. Devuelve tiempos y conteos."""
+    """Hornea el rango compartiendo la escena abierta (cache de sightread.lector) y el almacen de activos, y escribe el plano. Devuelve tiempos y conteos."""
     from ..bake.hornear import hornear
     out = Path(salida); work = out / "_horneado"; work.mkdir(parents=True, exist_ok=True)
     almacen.reset_stats(); almacen.tomar_registro()

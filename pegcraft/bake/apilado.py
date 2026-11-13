@@ -161,6 +161,18 @@ TODAS = ("underlay", "colour", "line", "overlay")
 FILTRO = {"LINE_ART": {"line"}, "COLOR_ART": {"colour"}, "OVERLAY": {"overlay"}, "UNDERLAY": {"underlay"}}
 SI = lambda v: str(v).lower() in ("true", "y", "1")
 
+# UNICO lugar con los tipos de nodo que el horneado modela (los lee `pegcraft.analisis` para marcar lo que NO esta aqui). Es la union de lo que cada etapa
+# trata de forma explicita: lector (grupos, READ, PEG, StaticConstraint, transparentes del evaluador), apilado (composite raiz, conectores, efectos),
+# matriz causal (CAMERA, PointConstraint2) y deformadores (censo: Offset/Curve/DeformationComposite/KinematicOutput/TransformationSwitch).
+from sightread.lector.evaluar import TRANSPARENTES as _TRANSPARENTES, TRANSFORMADORES as _TRANSFORMADORES
+TIPOS_MODELADOS = frozenset(set(_TRANSPARENTES) | set(_TRANSFORMADORES) | set(FILTRO) | {
+    "READ", "COMPOSITE", "WRITE", "DISPLAY", "CAMERA",                       # recorrido desde la raiz y camara
+    "LAYER_SELECTOR", "VISIBILITY", "CUTTER", "GAUSSIANBLUR-PLUGIN",         # conectores (filtro de capas, corte, matte, desenfoque de matte)
+    "BLEND_MODE_MODULE", "GLOW",                                             # efectos (solo la suma del GLOW; el resto se avisa)
+    "MasterController", "PointConstraint2",                                  # ignorado en el recorrido de imagen / constraint de matriz causal
+    "DeformationCompositeModule", "KinematicOutputModule", "TransformationSwitch",   # deformadores (censo)
+})
+
 
 def recorrer_conectores(g, raiz, exp=None, efectos=None):
     """`efectos` (dict opcional, se llena): BLEND_MODE_MODULE y GLOW activos y ALCANZADOS desde la raiz, para avisar (no cambia el recorrido ni el render)."""

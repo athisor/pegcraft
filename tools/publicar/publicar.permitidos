@@ -5,8 +5,11 @@ scripts/
 tests/
 docs/
 tools/publicar/
+tools/empaquetar/
 sightread/
 README.md
+CONTRIBUTING.md
+.github/
 LICENSE
 LICENSE-MIT
 LICENSE-APACHE

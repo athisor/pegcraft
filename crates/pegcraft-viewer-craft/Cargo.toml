@@ -4,7 +4,7 @@
 # See ATTRIBUTION.md.
 [package]
 name = "pegcraft-viewer-craft"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2024"
 rust-version = "1.95"
 description = "Visor de escenas Harmony horneadas alineado con la familia Craft (eframe 0.37 + fork storytold/egui + craft-ui)."
@@ -21,6 +21,10 @@ kurbo = "0.13"
 tiny-skia = "0.12"
 serde_json = "1"
 roxmltree = "0.21"
+# GPU (casilla «Acelerar por GPU»): vello 0.10 trae su propio wgpu 29 (eframe usa wgpu 30; conviven como dos versiones mayores y no comparten device).
+# Licencias: vello, wgpu, pollster = MIT/Apache-2.0. Solo crates.io.
+vello = { version = "0.10", features = ["bump_estimate"] }
+pollster = "0.3"
 
 [profile.release]
 opt-level = 3

@@ -2,11 +2,17 @@
 // Misma logica que ../pegcraft-viewer (spike sobre egui 0.35 crates.io + bucle propio); aqui los paneles van en el docking de craft-ui
 // (patron de craft-libs/crates/ui/examples/docking_native.rs y del dock.rs de cada Craft: un enum de paneles + un Layout).
 // SOLO LECTURA sobre el horneado: las ediciones viven en memoria y nunca se escriben al .xstage ni a los .tvg.
+// App de ventana en release: sin consola propia al abrir con doble clic o Start-Process. Desde una consola se re-engancha a la del padre (adjuntar_consola)
+// para que --medir, --screenshot, --comparar-gpu y --analizar sigan imprimiendo.
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod abrir;
+mod analizar;
 mod iconos;
 use iconos::Icono;
 mod nodos;
+mod comparar_gpu;
 mod render;
+mod render_gpu;
 
 use craft_ui::docking::{Action, DockArea, DockContent, DockStyle, Layout, Node};
 use std::collections::HashSet;
@@ -46,10 +52,17 @@ impl Panel {
     }
 }
 
-/// espacio de trabajo por omision: Capas | (Player sobre Nodos, Timeline abajo) | Parametros
+/// espacios de trabajo. Estándar: Capas | (Player sobre Timeline) | (Nodos sobre Parametros).
+/// Nodos grande y Revisión: Capas | ((Player sobre Nodos) sobre Timeline) | Parametros.
 fn espacio(kind: usize) -> Layout<Panel> {
     let tabs = |p: Panel| Node::Tabs { panels: vec![p], active: 0 };
     let split = |axis, r: f32, a: Node<Panel>, b: Node<Panel>| Node::Split { axis, size: SplitSize::Ratio(r), first: Box::new(a), second: Box::new(b) };
+    if kind == 0 {
+        let centro = split(SplitAxis::Vertical, 0.83, tabs(Panel::Player), tabs(Panel::Timeline));
+        let der = split(SplitAxis::Vertical, 0.50, tabs(Panel::Nodos), tabs(Panel::Parametros));
+        let resto = split(SplitAxis::Horizontal, 0.82, centro, der);
+        return Layout { root: Some(split(SplitAxis::Horizontal, 0.14, tabs(Panel::Capas), resto)), floating: vec![] };
+    }
     let medio = match kind {
         2 => tabs(Panel::Player), // revision: solo el player (Nodos se abre desde Ventanas)
         _ => split(SplitAxis::Vertical, if kind == 1 { 0.12 } else { 0.55 }, tabs(Panel::Player), tabs(Panel::Nodos)),
@@ -73,15 +86,23 @@ struct Opciones {
     nodos_grande: bool,
     abrir: Option<(String, u32, u32)>, // --abrir X.xstage --frames A:B : lanza el horneado al arrancar (prueba del flujo de «Abrir escena»)
     grupo: Option<String>, // --grupo Top/ch_rig : la vista de nodos arranca dentro de ese grupo
+    gpu: bool, // --gpu : arranca con «Acelerar por GPU» marcada (con --medir, mide por GPU)
+    comparar: Option<(PathBuf, Vec<usize>)>, // --comparar-gpu SALIDA [--cuadros 9,59,109] : GPU vs CPU Completa, cifras y láminas PNG
+    analizar: Option<String>, // --analizar CARPETA : abre «Analizar carpeta de planos» con esa carpeta ya listada (con --analizar-correr, también lanza el análisis; --log-analisis DIR)
+    analizar_correr: bool,
+    analizar_compartible: bool,
+    log_analisis: Option<String>,
+    ruta_explicita: bool, // se pasó una carpeta/archivo horneado en la línea de comandos
 }
 
 fn args() -> Opciones {
     let a: Vec<String> = std::env::args().skip(1).collect();
     let mut o = Opciones {
-        ruta: PathBuf::from(r"trabajo\horneado"),
-        grafo: None, shot: None, frame: 0, ocultar: vec![], editar: vec![], seleccionar: None, calidad: Calidad::Rapida, medir: false, tam: (1600.0, 900.0), nodos_grande: false, abrir: None, grupo: None,
+        ruta: abrir::entorno().trabajo.join("horneado"),
+        grafo: None, shot: None, frame: 0, ocultar: vec![], editar: vec![], seleccionar: None, calidad: Calidad::Rapida, medir: false, tam: (1600.0, 900.0), nodos_grande: false, abrir: None, grupo: None, gpu: false, comparar: None, analizar: None, analizar_correr: false, analizar_compartible: false, log_analisis: None, ruta_explicita: false,
     };
     let mut rango = (1u32, 1u32);
+    let mut cuadros: Vec<usize> = vec![];
     let mut i = 0;
     while i < a.len() {
         let sig = |i: usize| a.get(i + 1).cloned().unwrap_or_default();
@@ -97,16 +118,24 @@ fn args() -> Opciones {
             "--abrir" => { o.abrir = Some((sig(i), 1, 1)); i += 1 }
             "--frames" => { if let Some((a, b)) = sig(i).split_once(':') { rango = (a.parse().unwrap_or(1), b.parse().unwrap_or(1)); } i += 1 }
             "--medir" => o.medir = true,
+            "--gpu" => o.gpu = true,
+            "--analizar" => { o.analizar = Some(sig(i)); i += 1 }
+            "--analizar-correr" => o.analizar_correr = true,
+            "--analizar-compartible" => o.analizar_compartible = true,
+            "--log-analisis" => { o.log_analisis = Some(sig(i)); i += 1 }
+            "--comparar-gpu" => { o.comparar = Some((sig(i).into(), vec![])); i += 1 }
+            "--cuadros" => { cuadros = sig(i).split(',').filter_map(|s| s.trim().parse().ok()).collect(); i += 1 }
             "--calidad" => { o.calidad = match sig(i).as_str() { "completa" => Calidad::Completa, "exacta" => Calidad::Exacta, _ => Calidad::Rapida }; i += 1 }
             "--tam" => { if let Some((w, h)) = sig(i).split_once('x') { o.tam = (w.parse().unwrap_or(1600.0), h.parse().unwrap_or(900.0)); } i += 1 }
-            s if !s.starts_with("--") => o.ruta = s.into(),
+            s if !s.starts_with("--") => { o.ruta = s.into(); o.ruta_explicita = true }
             _ => {}
         }
         i += 1;
     }
     if let Some(a) = o.abrir.as_mut() { a.1 = rango.0; a.2 = rango.1; }
+    if let Some(c) = o.comparar.as_mut() { c.1 = cuadros; }
     if o.grafo.is_none() {
-        let d = PathBuf::from(r"trabajo\visor\grafo.json");
+        let d = abrir::entorno().trabajo.join("visor").join("grafo.json");
         if d.exists() { o.grafo = Some(d); }
     }
     o
@@ -151,9 +180,43 @@ struct Visor {
     t_hist: Instant,
     espacio: usize,
     dlg: abrir::Dialogo,
+    ana: analizar::Analisis,             // Archivo > Analizar carpeta de planos…
+    gpu_on: bool,                       // casilla «Acelerar por GPU»
+    gpu: Option<render_gpu::Gpu>,        // se crea al primer uso (0,4 s); None si no hay GPU o falló
+    gpu_aviso: Option<String>,           // por qué se cayó a CPU (visible en la barra)
+    gpu_prueba: Option<String>,          // diagnóstico de la última pasada por GPU (adaptador)
 }
 
 impl Visor {
+    fn gpu_fallo(&mut self, e: String) {
+        eprintln!("GPU: {e}");
+        self.gpu_aviso = Some(format!("GPU no disponible, dibujando en CPU: {e}"));
+        self.gpu_on = false;
+        self.gpu = None;
+    }
+    /// dibuja el fotograma `i` con la calidad actual: GPU si la casilla está marcada y la calidad lo permite (Exacta siempre CPU); si la GPU falla, CPU con aviso
+    fn dibujar(&mut self, i: usize) -> tiny_skia::Pixmap {
+        if self.gpu_on && self.q != Calidad::Exacta {
+            if self.gpu.is_none() {
+                match render_gpu::Gpu::nuevo() {
+                    Ok(g) => { self.gpu_prueba = Some(format!("{} (init {:.0} ms)", g.adaptador, g.init_ms)); self.gpu = Some(g) }
+                    Err(e) => self.gpu_fallo(e),
+                }
+            }
+            if let Some(g) = self.gpu.as_mut() {
+                match g.render(&self.frames[i], &self.estado, self.q, true) {
+                    Ok(pm) => return pm,
+                    Err(e) => self.gpu_fallo(e),
+                }
+            }
+        }
+        render::render(&self.frames[i], &mut self.cache, &self.estado, self.q)
+    }
+    fn poner_gpu(&mut self, on: bool) {
+        self.gpu_on = on;
+        if on { self.gpu_aviso = None; }
+        self.invalidar();
+    }
     /// reemplaza la escena cargada por la de una carpeta horneada (y su grafo); reinicia ediciones, historial y cachés
     fn cargar_carpeta(&mut self, ruta: &std::path::Path, grafo: Option<PathBuf>) -> Result<(), String> {
         let rutas = descubrir(ruta);
@@ -171,6 +234,7 @@ impl Visor {
         self.rehacer.clear();
         self.prev = (HashSet::new(), HashMap::new());
         self.cache = Cache::default();
+        if let Some(g) = self.gpu.as_mut() { g.vaciar_cache(); }
         self.texs.clear();
         self.vista = nodos::Vista::nueva(&raiz);
         self.grafo = grafo;
@@ -224,14 +288,21 @@ impl Visor {
     }
     fn nuevo(o: &Opciones) -> Result<Self, String> {
         let rutas = descubrir(&o.ruta);
-        if rutas.is_empty() { return Err(format!("no hay escenas en {:?}", o.ruta)); }
-        let frames: Vec<Escena> = rutas.iter().map(|r| render::cargar(r)).collect::<Result<_, _>>()?;
+        // Sin ruta pedida y sin nada horneado (primer arranque, p. ej. doble clic en el paquete): visor vacío con el diálogo «Abrir escena» a la vista.
+        let vacio = rutas.is_empty() && !o.ruta_explicita;
+        if rutas.is_empty() && !vacio { return Err(format!("no hay escenas en {:?}", o.ruta)); }
+        let frames: Vec<Escena> = if vacio {
+            vec![Escena { nombre: "(sin escena)".into(), fotograma: 1, tam: (1920, 1080), cam: (0.0, 0.0, 1.0, 1.0, 1.0), base: PathBuf::new(), piezas: vec![] }]
+        } else {
+            rutas.iter().map(|r| render::cargar(r)).collect::<Result<_, _>>()?
+        };
         let grafo = o.grafo.as_ref().and_then(|g| nodos::cargar(g).map_err(|e| eprintln!("grafo: {e}")).ok());
         let raiz = grafo.as_ref().map(|g| g.raiz.clone()).unwrap_or("Top".into());
         let mut v = Visor {
             cur: o.frame.min(frames.len() - 1), frames, playing: false, t_play: Instant::now(), fps: 24.0, cache: Cache::default(), estado: Estado::default(),
             sel: None, filtro: String::new(), q: o.calidad, texs: HashMap::new(), ultimo_ms: 0.0, grafo, vista: nodos::Vista::nueva(&raiz),
-            herr: Herr::Seleccionar, hist: vec![], rehacer: vec![], prev: (HashSet::new(), HashMap::new()), t_hist: Instant::now(), espacio: if o.nodos_grande { 1 } else { 0 }, dlg: abrir::Dialogo::default(),
+            herr: Herr::Seleccionar, hist: vec![], rehacer: vec![], prev: (HashSet::new(), HashMap::new()), t_hist: Instant::now(), espacio: if o.nodos_grande { 1 } else { 0 }, dlg: abrir::Dialogo::default(), ana: analizar::Analisis::default(),
+            gpu_on: o.gpu, gpu: None, gpu_aviso: None, gpu_prueba: None,
         };
         for s in &o.ocultar {
             if let Some(p) = v.frames[v.cur].piezas.iter().find(|p| p.key.contains(s.as_str())) { v.estado.ocultas.insert(p.key.clone()); }
@@ -255,6 +326,7 @@ impl Visor {
             v.sincronizar_nodos();
         }
         v.prev = (v.estado.ocultas.clone(), v.estado.ediciones.clone());
+        if vacio { v.dlg.abierto = true; }
         Ok(v)
     }
     fn sincronizar_nodos(&mut self) {
@@ -269,7 +341,7 @@ impl Visor {
     fn textura(&mut self, ctx: &egui::Context) -> Option<egui::TextureHandle> {
         if !self.texs.contains_key(&self.cur) {
             let t0 = Instant::now();
-            let pm = render::render(&self.frames[self.cur], &mut self.cache, &self.estado, self.q);
+            let pm = self.dibujar(self.cur);
             self.ultimo_ms = t0.elapsed().as_secs_f32() * 1000.0;
             let img = egui::ColorImage::from_rgba_premultiplied([pm.width() as usize, pm.height() as usize], pm.data());
             self.texs.insert(self.cur, ctx.load_texture(format!("cuadro{}", self.cur), img, egui::TextureOptions::LINEAR));
@@ -294,6 +366,17 @@ impl Visor {
                 ui.selectable_value(&mut self.q, Calidad::Exacta, "1× exacta (ss2+gauss)");
             });
             if q0 != self.q { self.invalidar(); }
+            let mut on = self.gpu_on;
+            let r = ui.checkbox(&mut on, "Acelerar por GPU").on_hover_text(
+                "Dibuja cada fotograma con vello sobre la GPU (decenas de veces más rápido que la CPU).\n\
+                 Calidad «exacta» se queda en CPU (es la referencia contra Harmony).\n\
+                 Diferencias con la CPU: el antialias de bordes no es idéntico (vello vs tiny-skia) y la GPU sí dibuja degradados (la CPU los ignora).\n\
+                 Ninguno de los dos hace aún la mezcla aditiva «glow suma» ni difumina los mattes.\n\
+                 Si la GPU falla, vuelve a CPU y lo avisa aquí.");
+            if r.changed() { self.poner_gpu(on); }
+            if self.gpu_on && self.q == Calidad::Exacta { ui.weak("exacta: CPU"); }
+            else if self.gpu_on { if let Some(a) = &self.gpu_prueba { ui.weak(a.as_str()); } }
+            if let Some(a) = &self.gpu_aviso { ui.colored_label(egui::Color32::from_rgb(255, 170, 60), a.as_str()); }
             if ui.button("Reiniciar ediciones").clicked() { self.estado.ediciones.clear(); self.invalidar(); }
             ui.separator();
             ui.label(format!("render: {:.0} ms", self.ultimo_ms));
@@ -549,6 +632,8 @@ struct App {
     frames: u32,
     pedida: bool,
     auto: Option<(String, u32, u32)>,
+    auto_analizar: Option<(String, bool, Option<String>, bool)>, // (carpeta, lanzar, carpeta del log, log para compartir)
+    lanzar_analisis: bool, // --analizar-correr: lanza el análisis en cuanto termina de listar los planos
     quieto: u32, // cuadros sin horneado en curso (la captura espera a que termine)
 }
 
@@ -561,7 +646,14 @@ impl eframe::App for App {
             v.dlg.xstage = x; v.dlg.desde = a; v.dlg.hasta = b; v.dlg.abierto = true;
             v.dlg.lanzar(&ctx);
         }
-        if !v.dlg.corriendo() { self.quieto += 1; }
+        if let Some((carpeta, lanzar, log, comp)) = self.auto_analizar.take() {
+            v.ana.carpeta = carpeta; v.ana.abierto = true; v.ana.compartible = comp;
+            if let Some(l) = log { v.ana.log_dir = l; }
+            v.ana.escanear(&ctx);
+            self.lanzar_analisis = lanzar;
+        }
+        if self.lanzar_analisis && v.ana.planos_listos() { self.lanzar_analisis = false; v.ana.lanzar(&ctx); }
+        if !v.dlg.corriendo() && !v.ana.ocupado() && !self.lanzar_analisis { self.quieto += 1; }
         if v.dlg.corriendo() { ctx.request_repaint_after(std::time::Duration::from_millis(250)); }
         if v.playing && v.t_play.elapsed().as_secs_f32() >= 1.0 / v.fps {
             v.t_play = Instant::now();
@@ -574,8 +666,19 @@ impl eframe::App for App {
         egui::Panel::top("menu").show(ui, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("Archivo", |ui| {
-                    if ui.button("Abrir escena…").clicked() { v.dlg.abierto = true; ui.close(); }
+                    if ui.button("Abrir…").on_hover_text("Elige un .xstage y una carpeta de salida; convierte todos los fotogramas y los abre.").clicked() {
+                        ui.close();
+                        let c = ui.ctx().clone();
+                        if !v.dlg.corriendo() { v.dlg.abrir_rapido(&c); }
+                    }
+                    if ui.button("Abrir escena (opciones)…").clicked() { v.dlg.abierto = true; ui.close(); }
                     if ui.button("Abrir carpeta horneada…").clicked() { v.dlg.abierto = true; ui.close(); }
+                    ui.separator();
+                    if ui.button("Analizar carpeta de planos…").on_hover_text("Lista los .xstage de una carpeta y detecta lo que pegcraft no conoce o no soporta; deja un log.").clicked() {
+                        ui.close();
+                        v.ana.abierto = true;
+                        if v.ana.carpeta.trim().is_empty() { let c = ui.ctx().clone(); v.ana.elegir_carpeta(&c); }
+                    }
                     ui.separator();
                     if ui.button("Salir").clicked() { ctx.send_viewport_cmd(egui::ViewportCommand::Close); }
                 });
@@ -591,6 +694,9 @@ impl eframe::App for App {
                     for (q, n) in [(Calidad::Rapida, "½ rápida"), (Calidad::Completa, "1× completa"), (Calidad::Exacta, "1× exacta (ss2 + gauss)")] {
                         if ui.radio_value(&mut v.q, q, n).changed() { v.invalidar(); }
                     }
+                    ui.separator();
+                    let mut on = v.gpu_on;
+                    if ui.checkbox(&mut on, "Acelerar por GPU").changed() { v.poner_gpu(on); }
                     ui.separator();
                     if ui.button("Restablecer espacio de trabajo").clicked() { self.layout = espacio(v.espacio); ui.close(); }
                 });
@@ -614,6 +720,7 @@ impl eframe::App for App {
                 });
             });
         });
+        analizar::mostrar(&ctx, &mut v.ana);
         match abrir::mostrar(&ctx, &mut v.dlg) {
             abrir::Orden::Cargar(r, g) => match v.cargar_carpeta(&r, g) {
                 Ok(()) => v.dlg.abierto = false,
@@ -643,7 +750,8 @@ impl eframe::App for App {
         egui::Panel::bottom("estado").show(ui, |ui| {
             ui.horizontal(|ui| {
                 let sel = v.sel.as_deref().and_then(|k| k.rsplit('/').next()).unwrap_or("—");
-                ui.label(format!("fotograma {} · herramienta {:?} · selección {} · {} editadas · {} ocultas · render {:.0} ms", v.frames[v.cur].fotograma, v.herr, sel, v.estado.ediciones.len(), v.estado.ocultas.len(), v.ultimo_ms));
+                ui.label(format!("fotograma {} · herramienta {:?} · selección {} · {} editadas · {} ocultas · render {:.0} ms ({})", v.frames[v.cur].fotograma, v.herr, sel, v.estado.ediciones.len(), v.estado.ocultas.len(), v.ultimo_ms,
+                    if v.gpu_on && v.q != Calidad::Exacta && v.gpu.is_some() { "GPU" } else { "CPU" }));
             });
         });
         let style = DockStyle::from_ui(ui);
@@ -675,25 +783,83 @@ impl eframe::App for App {
 
 fn medir(o: &Opciones) {
     let mut v = Visor::nuevo(o).expect("cargar");
+    // PEGCRAFT_MEDIR_CADA=K mide uno de cada K fotogramas (Completa y Exacta tardan segundos por fotograma)
+    let cada: usize = std::env::var("PEGCRAFT_MEDIR_CADA").ok().and_then(|s| s.parse().ok()).filter(|k| *k >= 1).unwrap_or(1);
+    let todos = std::mem::take(&mut v.frames);
+    v.frames = todos.into_iter().step_by(cada).collect();
     let n = v.frames.len();
-    println!("{} fotogramas, {} piezas en el primero", n, v.frames[0].piezas.len());
-    for q in [Calidad::Rapida, Calidad::Completa] {
-        let _ = render::render(&v.frames[0], &mut v.cache, &v.estado, q);
+    println!("{} fotogramas medidos (1 de cada {}), {} piezas en el primero", n, cada, v.frames[0].piezas.len());
+    // Reproducción real: 1.ª pasada con la caché de dibujos vacía (carga y teselado de SVG + rasterizado), 2.ª con la caché llena (solo rasterizado);
+    // la diferencia es la carga de SVG. «ColorImage» = construir la imagen que egui sube a la GPU (copia); la subida a la GPU no se mide aquí.
+    // Con --gpu se miden Rápida y Completa por GPU (vello; Exacta es siempre CPU); el tiempo incluye la lectura de vuelta a la CPU.
+    let mut gpu = if o.gpu {
+        match render_gpu::Gpu::nuevo() { Ok(g) => { println!("GPU: {} (init {:.0} ms)", g.adaptador, g.init_ms); Some(g) } Err(e) => { println!("GPU no disponible: {e}"); return; } }
+    } else { None };
+    let calidades: &[Calidad] = if gpu.is_some() { &[Calidad::Rapida, Calidad::Completa] } else { &[Calidad::Rapida, Calidad::Completa, Calidad::Exacta] };
+    for &q in calidades {
+        v.cache = render::Cache::default();
+        if let Some(g) = gpu.as_mut() { g.vaciar_cache(); }
+        let paso = |v: &mut Visor, gpu: &mut Option<render_gpu::Gpu>| -> (Option<tiny_skia::Pixmap>, f32) {
+            let t = Instant::now();
+            let mut ult = None;
+            for f in &v.frames {
+                ult = Some(match gpu.as_mut() {
+                    Some(g) => g.render(f, &v.estado, q, true).expect("render GPU"),
+                    None => render::render(f, &mut v.cache, &v.estado, q),
+                });
+            }
+            (ult, t.elapsed().as_secs_f32() * 1000.0 / n as f32)
+        };
+        let (_, fria) = paso(&mut v, &mut gpu);
+        let (ult, tibia) = paso(&mut v, &mut gpu);
+        let pm = ult.unwrap();
         let t = Instant::now();
-        for f in &v.frames { let _ = render::render(f, &mut v.cache, &v.estado, q); }
-        println!("{:?}: {:.0} ms/fotograma", q, t.elapsed().as_secs_f32() * 1000.0 / n as f32);
+        for _ in 0..20 { let _ = egui::ColorImage::from_rgba_premultiplied([pm.width() as usize, pm.height() as usize], pm.data()); }
+        let subida = t.elapsed().as_secs_f32() * 1000.0 / 20.0;
+        println!("{:?}{}: 1.a pasada {:.1} ms/fot ({:.1} fps) | caché llena {:.1} ms/fot ({:.1} fps) | carga SVG {:.1} ms/fot | ColorImage {:.1} ms | {} SVG en caché",
+                 q, if gpu.is_some() { " [GPU]" } else { " [CPU]" }, fria, 1000.0 / fria, tibia, 1000.0 / tibia, fria - tibia, subida,
+                 gpu.as_ref().map(|g| g.n_dibujos()).unwrap_or(v.cache.dibujos.len()));
     }
 }
 
+/// Windows: engancha stdout/stderr a la consola del proceso padre (si la hay) para que las salidas de consola sigan viéndose con windows_subsystem = "windows".
+#[cfg(windows)]
+fn adjuntar_consola() {
+    use std::os::windows::io::IntoRawHandle;
+    unsafe extern "system" {
+        fn AttachConsole(pid: u32) -> i32;
+        fn GetStdHandle(n: u32) -> isize;
+        fn SetStdHandle(n: u32, h: isize) -> i32;
+    }
+    const ATTACH_PARENT_PROCESS: u32 = 0xFFFF_FFFF;
+    const STD_OUTPUT_HANDLE: u32 = -11i32 as u32;
+    const STD_ERROR_HANDLE: u32 = -12i32 as u32;
+    unsafe {
+        if AttachConsole(ATTACH_PARENT_PROCESS) == 0 { return; } // sin consola padre (doble clic, Start-Process): nada que enganchar
+        // un exe de ventana arranca con los manejadores estándar vacíos; si el padre no los redirigió, apuntarlos a la consola
+        for n in [STD_OUTPUT_HANDLE, STD_ERROR_HANDLE] {
+            let h = GetStdHandle(n);
+            if h == 0 || h == -1 {
+                if let Ok(f) = std::fs::OpenOptions::new().write(true).open("CONOUT$") { SetStdHandle(n, f.into_raw_handle() as isize); }
+            }
+        }
+    }
+}
+#[cfg(not(windows))]
+fn adjuntar_consola() {}
+
 fn main() -> eframe::Result {
+    adjuntar_consola();
     let o = args();
     if o.medir { medir(&o); return Ok(()); }
+    if let Some((salida, cuadros)) = &o.comparar { comparar_gpu::comparar(&o.ruta, salida, cuadros); return Ok(()); }
     let mut visor = match Visor::nuevo(&o) { Ok(v) => v, Err(e) => { eprintln!("error: {e}"); std::process::exit(1) } };
     if let Some(g) = &o.grupo { visor.vista.grupo = g.clone(); visor.vista.sel = None; visor.vista.ajustar = true; }
     let options = eframe::NativeOptions { viewport: egui::ViewportBuilder::default().with_inner_size([o.tam.0, o.tam.1]).with_title("pegcraft-viewer-craft"), ..Default::default() };
     let layout = espacio(if o.nodos_grande { 1 } else { 0 });
     let shot = o.shot.clone();
     let o_abrir = o.abrir.clone();
+    let o_analizar = o.analizar.clone().map(|c| (c, o.analizar_correr, o.log_analisis.clone(), o.analizar_compartible));
     eframe::run_native("pegcraft-viewer-craft", options, Box::new(move |cc| {
         // pila de fuentes de craft-ui (la misma de todos los Craft): caras por omision de egui + fuentes del sistema para simbolos (⏮ ▶ ✂)
         use egui::FontFamily::{Monospace, Proportional};
@@ -703,6 +869,6 @@ fn main() -> eframe::Result {
             .system_fonts(craft_ui::fonts::SystemFonts::AfterCraft)
             .install(&cc.egui_ctx);
         cc.egui_ctx.set_theme(egui::Theme::Dark);
-        Ok(Box::new(App { visor, layout, shot, frames: 0, pedida: false, auto: o_abrir, quieto: 0 }))
+        Ok(Box::new(App { visor, layout, shot, frames: 0, pedida: false, auto: o_abrir, auto_analizar: o_analizar, lanzar_analisis: false, quieto: 0 }))
     }))
 }

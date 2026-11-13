@@ -45,7 +45,7 @@ def _elemento(tvg_path, escena):
 
 
 def decodificar(tvg_path, escena):
-    """modelo de `pegcraft.tvg` con la paleta de la escena encima de la copia local del dibujo. Devuelve (modelo, {id: matrices}, elemento)."""
+    """modelo de `sightread.tvg` con la paleta de la escena encima de la copia local del dibujo. Devuelve (modelo, {id: matrices}, elemento)."""
     m = _decodificar(Path(tvg_path).read_bytes())
     el = _elemento(tvg_path, escena)
     m["paleta"].update(_plt.paleta_tvg(escena, elemento=el))     # PLT-v0 §7: la paleta de la escena gana sobre la TPAL

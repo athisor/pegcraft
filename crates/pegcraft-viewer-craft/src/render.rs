@@ -84,7 +84,20 @@ pub struct Cache {
     pub dibujos: HashMap<PathBuf, Option<Rc<Dibujo>>>,
 }
 impl Cache {
+    /// limpieza léxica de `.` y `..`: `f0001\..\dibujos\x.svg` y `f0002\..\dibujos\x.svg` (SVG compartidos de hornear-rango) son la misma entrada
+    pub fn limpiar(p: &std::path::Path) -> PathBuf {
+        let mut limpia = PathBuf::new();
+        for c in p.components() {
+            match c {
+                std::path::Component::CurDir => {}
+                std::path::Component::ParentDir if matches!(limpia.components().next_back(), Some(std::path::Component::Normal(_))) => { limpia.pop(); }
+                c => limpia.push(c.as_os_str()),
+            }
+        }
+        limpia
+    }
     pub fn dibujo(&mut self, p: PathBuf) -> Option<Rc<Dibujo>> {
+        let p = Self::limpiar(&p);
         self.dibujos
             .entry(p.clone())
             .or_insert_with(|| {
@@ -227,7 +240,7 @@ pub struct Estado {
 }
 
 /// matriz de campos (+ edicion) -> transform sobre coordenadas tvg (y arriba), en pixeles del lienzo de trabajo
-fn ts_de(e: &Escena, m: &M, ed: Option<&Edit>, w: u32) -> Transform {
+pub fn ts_de(e: &Escena, m: &M, ed: Option<&Edit>, w: u32) -> Transform {
     let (cx, cy, sx, sy, div) = e.cam;
     let sw = w as f64 / 1920.0;
     let (mut a, mut b, mut tx, mut c, mut d, mut ty) = (m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2]);
@@ -331,11 +344,15 @@ fn reducir_gauss(src: &Pixmap, ss: u32, sigma: f32, ow: u32, oh: u32) -> Pixmap 
 }
 
 pub fn render(e: &Escena, cache: &mut Cache, st: &Estado, q: Calidad) -> Pixmap {
+    render_fondo(e, cache, st, q, true)
+}
+/// `gris=false` deja el fondo transparente (para comparar coberturas de alfa con la GPU)
+pub fn render_fondo(e: &Escena, cache: &mut Cache, st: &Estado, q: Calidad, gris: bool) -> Pixmap {
     let (ow, oh) = q.out(e.tam);
     let ss = q.ss();
     let (w, h) = (ow * ss, oh * ss);
     let mut pm = Pixmap::new(w, h).unwrap();
-    pm.fill(Color::from_rgba8(128, 128, 128, 255));
+    if gris { pm.fill(Color::from_rgba8(128, 128, 128, 255)); }
     for p in &e.piezas {
         if st.ocultas.contains(&p.key) {
             continue;

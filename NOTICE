@@ -5,11 +5,16 @@ Licensed under the MIT License or the Apache License, Version 2.0, at your optio
 
 Independence and trademarks
 
-pegcraft is an independent, clean-room project. It is not affiliated with, endorsed by or
-derived from Toon Boom Animation Inc. or its products. Product names such as Harmony are
-trademarks of their owners and are used only to say which file format this project reads.
-Its behaviour is learned from scene files and from comparing renders, not from proprietary
-code, documentation, assets or the contents of any installation.
+pegcraft is an independent project. It is not affiliated with, endorsed by or derived from
+Toon Boom Animation Inc. or its products. Product names such as Harmony are trademarks of
+their owners and are used only to say which file format this project reads. It does not use
+proprietary code, documentation, assets or the contents of any installation.
+
+The readers in sightread/ are the clean-room core: their method and provenance are documented
+and audited (sightread/NOTICE, sightread/docs/PROCEDENCIA.md). The rest of pegcraft (baking,
+deformers, rasterizers, viewer) is a demonstration wrapper around that core; its provenance has
+not been through the same process, and it is being replaced piece by piece by parts built with
+the sightread method.
 
 ArtCraft family
 

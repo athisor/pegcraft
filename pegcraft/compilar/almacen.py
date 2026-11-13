@@ -7,9 +7,9 @@ Desactivar: env PEGCRAFT_ALMACEN=no.
 """
 import hashlib, json, os, shutil, time
 from pathlib import Path
-from ..config import RAIZ
+from ..config import CACHE
 
-RAIZ_ALMACEN = Path(os.environ.get("PEGCRAFT_CACHE_SVG", str(RAIZ / "cache" / "svg")))
+RAIZ_ALMACEN = Path(os.environ.get("PEGCRAFT_CACHE_SVG", str(CACHE / "svg")))
 ACTIVO = os.environ.get("PEGCRAFT_ALMACEN", "si") != "no"
 PAQUETE = Path(__file__).resolve().parents[1]   # carpeta pegcraft/
 ESQUEMA = "1"          # subir si cambia el formato de clave

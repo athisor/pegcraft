@@ -1,0 +1,50 @@
+name: Desconocidos de Harmony
+description: Resumen de lo que pegcraft no conoce en tus escenas (salida de `pegcraft analizar --compartible`). Nunca escenas ni nombres.
+title: "Desconocidos: <n> escenas, Harmony <versión>"
+labels: ["diccionario"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Guía completa, con la auditoría de privacidad: [docs/aportar/AGENTE.md](https://github.com/athisor/pegcraft/blob/main/docs/aportar/AGENTE.md).
+        Antes de abrir uno nuevo, revisa si ya hay un issue `diccionario` con las mismas claves y comenta ahí.
+  - type: input
+    id: pegcraft
+    attributes:
+      label: Versión de pegcraft
+      description: El campo "pegcraft" del archivo compartible.
+    validations:
+      required: true
+  - type: input
+    id: harmony
+    attributes:
+      label: Versiones de Harmony de las escenas
+      description: El campo "harmony" del archivo compartible (por ejemplo, 2402 build 23443).
+    validations:
+      required: true
+  - type: input
+    id: escenas
+    attributes:
+      label: Escenas analizadas
+      description: El campo "escenas".
+    validations:
+      required: true
+  - type: textarea
+    id: compartible
+    attributes:
+      label: Contenido de *_compartible.json
+      description: Pega el archivo entero, tal cual. No pegues el .jsonl, el .md ni el .resumen.json; esos son privados.
+      render: json
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacidad
+    attributes:
+      label: Privacidad
+      options:
+        - label: "Corrí `python -m pegcraft analizar --verificar <archivo> --escenas <carpeta>` y dijo OK."
+          required: true
+        - label: Revisé el archivo y no trae rutas, nombres de escenas, personajes, proyectos ni personas.
+          required: true
+        - label: El dueño de las escenas aprobó publicar este resumen.
+          required: true

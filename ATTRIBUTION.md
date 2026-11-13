@@ -1,6 +1,6 @@
 # Atribución
 
-pegcraft es un proyecto independiente de sala limpia (ver [NOTICE](NOTICE)). Durante el diseño se consultó la familia
+pegcraft es un proyecto independiente; su núcleo de sala limpia es `sightread/` (ver [NOTICE](NOTICE)). Durante el diseño se consultó la familia
 de aplicaciones y bibliotecas de código abierto **ArtCraft** (organización de GitHub `storytold`). Este archivo registra,
 **por separado para cada paquete**, qué se (1) *usó como dependencia*, (2) *solo se observó* como referencia de diseño,
 (3) *se copió o adaptó* y (4) *se extendió o modificó*, y qué *no se usó en absoluto*.
@@ -116,7 +116,7 @@ y `crates/pegcraft-gpu/src/main.rs` copia la lógica de lectura de escenas de `p
 - El nombre **ArtCraft**, su wordmark y logos, el ícono de la app AniCraft y todo lo de `docs/brand/`: son marcas y **no** están cubiertas por las licencias de código abierto; aquí no se usan ni se distribuyen.
 - Fuentes y conjuntos de íconos (Lucide, Feather, fuentes Ubuntu / Noto, `egui-phosphor`): no se incluye ninguno. Los íconos del visor se dibujan en código (`iconos.rs`).
 - Documentos de muestra, corpus XFL, fixtures de prueba, imágenes doradas, presets, shaders y otros recursos de cualquier app ArtCraft.
-- Cualquier código de Adobe, Toon Boom u otros productos comerciales (pegcraft es de sala limpia; ver NOTICE).
+- Cualquier código de Adobe, Toon Boom u otros productos comerciales (ver NOTICE).
 
 ## Bibliotecas de terceros (no ArtCraft)
 

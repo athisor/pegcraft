@@ -1,4 +1,4 @@
-"""Integracion de bake/gradientes con pegcraft.plt: paleta de la escena sobre la TPAL y degradados con la matriz de modelo["tgco"]."""
+"""Integracion de bake/gradientes con sightread.plt: paleta de la escena sobre la TPAL y degradados con la matriz de modelo["tgco"]."""
 import sys
 import tempfile
 import unittest

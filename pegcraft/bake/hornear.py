@@ -56,11 +56,23 @@ def convertir_tvg(tvg, esc, svg, gradientes=True):
         return f"{type(ex).__name__}: {str(ex)[:160]}", None
 
 
+class Compartido:
+    """Estado que `hornear-rango` comparte entre fotogramas de UN proceso: los SVG base se convierten una sola vez en `comun` (carpeta `dibujos` de la
+    salida del rango) y cada escena.json los referencia como `../dibujos/x.svg`; los deformados dependen del fotograma y quedan en la carpeta de cada uno.
+    `info` repone en cada fotograma lo que la conversion aporta al escena.json (degradados y avisos), para que el JSON salga como si lo hubiera
+    convertido ese fotograma; `ilegibles` evita releer un .tvg que ya fallo."""
+    def __init__(self, comun):
+        self.comun = Path(comun)
+        self.info = {}          # nombre del svg -> (lista de degradados o None, avisos)
+        self.ilegibles = {}     # nombre del .tvg -> error
+        self.listo = {}         # (carpeta, elemento, dibujo) -> (tvg, svg, clave base): resuelto y convertido, no se vuelve a mirar el disco
+
+
 def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conectores=True, exp="", z="global",
             apilado_modo="puertos", recortadas="omitir", camara=None, desfase=None, desfase_grupo="Top/Personaje/", carpeta="real",
-            opacidad="leer", matriz_causal=True, deformadores=True, gradientes=True, glow_suma=True):
+            opacidad="leer", matriz_causal=True, deformadores=True, gradientes=True, glow_suma=True, compartido=None):
     """Hornea y devuelve (ruta del json, dict resumen). `desfase` = 'dx_sin_espejo,dx_espejo' en campos (DIAGNOSTICO) para las piezas
-    cuya ruta empieza con `desfase_grupo`."""
+    cuya ruta empieza con `desfase_grupo`. `compartido` (Compartido) = modo rango: ver esa clase."""
     excluir = _config.EXCLUIR if excluir is None else excluir     # regex de rutas que no se dibujan; vacia = ninguna (PEGCRAFT_EXCLUIR)
     xs = str(xs); out = Path(salida); excl = re.compile(excluir, re.I) if excluir else None; esc = Path(xs).parent
     camara = camara or ("metricas" if matriz_causal else "iso")
@@ -72,7 +84,9 @@ def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conec
     ev = L.nodos_evaluados(xs, f)
     evd = {apilado.norm(n["ruta"]): (i, n) for i, n in enumerate(ev)}
     (out / "dibujos").mkdir(parents=True, exist_ok=True)
-    avisos_glob = []; GRADS = {}; _ILEGIBLES = {}
+    avisos_glob = []; GRADS = {}; _ILEGIBLES = compartido.ilegibles if compartido else {}
+    dir_base = compartido.comun if compartido else out / "dibujos"      # donde viven los SVG base
+    pre_base = _os.path.relpath(dir_base, out).replace("\\", "/") if compartido else "dibujos"
     CAUSAL = mc.matrices(xs, f, list(evd), avisos_glob) if matriz_causal else None
 
     PERSP_D = float(PERSP_ENV) if PERSP_ENV not in (None, "") else (1080.0 / CAM["sy"]) / 2.0
@@ -157,12 +171,16 @@ def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conec
         det = mt[0][0] * mt[1][1] - mt[0][1] * mt[1][0]
         return [[mt[0][0], mt[0][1], mt[0][2] + (d0 if det > 0 else d1)], mt[1]]
 
+    _ev_op = []
+
     def _opacidad(ruta):
         """MEDIDO (diag3): el atributo `opacity` del READ (0-100, def. 100) es la capa semitransparente."""
         if opacidad == "ignorar":
             return 1.0
         try:
-            return float(L.evaluador(xs).valor(ruta, "opacity", f)) / 100.0
+            if not _ev_op:
+                _ev_op.append(L.evaluador(xs))     # una vez por fotograma: cada llamada a L.evaluador reabre (stat + realpath) la escena
+            return float(_ev_op[0].valor(ruta, "opacity", f)) / 100.0
         except Exception as ex:
             avisos_glob.append(f"opacidad no leida {ruta}: {ex}"); return 1.0
 
@@ -174,38 +192,59 @@ def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conec
             avisos_glob.append(f"sin elemento: {ruta}"); return None
         n = evd[ruta][1]
         carp = el[1] if (carpeta == "real" and el[1]) else el[0]
-        tvg = esc / "elements" / carp / f"{el[0]}-{n['dibujo']}.tvg"
-        if not tvg.is_file():     # el .xstage puede nombrar otra capitalizacion que el disco (Linux)
-            _t = _rutas.buscar(esc, "elements", carp, f"{el[0]}-{n['dibujo']}.tvg")
-            if _t is None or not _t.is_file():
-                avisos_glob.append(f"sin tvg {tvg.name} ({ruta})"); return None
-            tvg = _t
-        svg = out / "dibujos" / (f"{el[0]}-{n['dibujo']}.svg" if carp == el[0] else f"{carp}-{n['dibujo']}.svg")
-        if tvg.name in _ILEGIBLES:   # ya fallo en este cuadro: misma pieza omitida sin volver a leerlo
-            avisos_glob.append(f"TVG_ILEGIBLE {tvg.name} ({ruta}): {_ILEGIBLES[tvg.name]}; pieza omitida"); return None
-        clave_b = None
-        if not svg.exists():
-            # ALMACEN DE ACTIVOS (compilar/almacen.py): mismo SVG, clave por contenido; la salida de este horneado no cambia
-            clave_b = _alm.clave_base(tvg, esc, gradientes) if _alm.ACTIVO else None
-            if clave_b and _alm.traer(clave_b, svg):
-                pass
+        mk = (carp, el[0], n["dibujo"])
+        if compartido and mk in compartido.listo:      # ya resuelto y convertido en un fotograma anterior: sin stat ni claves
+            tvg, svg, clave_b = compartido.listo[mk]
+            g_, av_ = compartido.info.get(svg.name, (None, []))
+            if g_:
+                GRADS[svg.name] = g_
+            avisos_glob.extend(av_)
+            if clave_b:
+                _alm.registrar(svg.name, clave_b, tvg=tvg)
+        else:
+            tvg = esc / "elements" / carp / f"{el[0]}-{n['dibujo']}.tvg"
+            if not tvg.is_file():     # el .xstage puede nombrar otra capitalizacion que el disco (Linux)
+                _t = _rutas.buscar(esc, "elements", carp, f"{el[0]}-{n['dibujo']}.tvg")
+                if _t is None or not _t.is_file():
+                    avisos_glob.append(f"sin tvg {tvg.name} ({ruta})"); return None
+                tvg = _t
+            svg = dir_base / (f"{el[0]}-{n['dibujo']}.svg" if carp == el[0] else f"{carp}-{n['dibujo']}.svg")
+            if tvg.name in _ILEGIBLES:   # ya fallo en este cuadro: misma pieza omitida sin volver a leerlo
+                avisos_glob.append(f"TVG_ILEGIBLE {tvg.name} ({ruta}): {_ILEGIBLES[tvg.name]}; pieza omitida"); return None
+            clave_b = None
+            if not svg.exists():
+                # ALMACEN DE ACTIVOS (compilar/almacen.py): mismo SVG, clave por contenido; la salida de este horneado no cambia
+                clave_b = _alm.clave_base(tvg, esc, gradientes) if _alm.ACTIVO else None
+                if clave_b and _alm.traer(clave_b, svg):
+                    pass
+                else:
+                    _t0 = _time.perf_counter()
+                    _err, r_g = convertir_tvg(tvg, esc, svg, gradientes)
+                    if _err:
+                        _ILEGIBLES[tvg.name] = _err
+                        avisos_glob.append(f"TVG_ILEGIBLE {tvg.name} ({ruta}): {_err}; pieza omitida"); return None
+                    if gradientes and r_g:   # rellenos Gradient como <linearGradient> (bake/gradientes.py); sin ellos, el SVG base del lector .tvg
+                        if r_g["gradientes"]:
+                            GRADS[svg.name] = [g["nombre"] for g in r_g["gradientes"]]
+                        avisos_glob.extend(f"{svg.name}: {a_}" for a_ in r_g["avisos"])
+                    _alm.STATS["t_convertir"] += _time.perf_counter() - _t0
+                    if compartido:
+                        compartido.info[svg.name] = ([g["nombre"] for g in r_g["gradientes"]] if gradientes and r_g and r_g["gradientes"] else None,
+                                                     [f"{svg.name}: {a_}" for a_ in r_g["avisos"]] if gradientes and r_g else [])
+                    if clave_b:
+                        _alm.guardar(clave_b, svg)
             else:
-                _t0 = _time.perf_counter()
-                _err, r_g = convertir_tvg(tvg, esc, svg, gradientes)
-                if _err:
-                    _ILEGIBLES[tvg.name] = _err
-                    avisos_glob.append(f"TVG_ILEGIBLE {tvg.name} ({ruta}): {_err}; pieza omitida"); return None
-                if gradientes and r_g:   # rellenos Gradient como <linearGradient> (bake/gradientes.py); sin ellos, el SVG base del lector .tvg
-                    if r_g["gradientes"]:
-                        GRADS[svg.name] = [g["nombre"] for g in r_g["gradientes"]]
-                    avisos_glob.extend(f"{svg.name}: {a_}" for a_ in r_g["avisos"])
-                _alm.STATS["t_convertir"] += _time.perf_counter() - _t0
-                if clave_b:
-                    _alm.guardar(clave_b, svg)
-        elif _alm.ACTIVO:
-            clave_b = _alm.clave_base(tvg, esc, gradientes)
-        if clave_b:
-            _alm.registrar(svg.name, clave_b, tvg=tvg)
+                if compartido and svg.name in compartido.info:    # ya convertido en un fotograma anterior de este proceso: repone lo que aporta al JSON
+                    g_, av_ = compartido.info[svg.name]
+                    if g_:
+                        GRADS[svg.name] = g_
+                    avisos_glob.extend(av_)
+                if _alm.ACTIVO:
+                    clave_b = _alm.clave_base(tvg, esc, gradientes)
+            if clave_b:
+                _alm.registrar(svg.name, clave_b, tvg=tvg)
+            if compartido:
+                compartido.listo[mk] = (tvg, svg, clave_b)
         if deformadores:
             segs = SEGS.get(ruta)
             nodos = [segs, PRES.get(ruta)] if segs else None
@@ -225,7 +264,7 @@ def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conec
                     if clave_d:
                         _alm.registrar(svg_d.name, clave_d, clave_b, tvg=tvg)
                 return f"dibujos/{svg_d.name}"
-        return f"dibujos/{svg.name}"
+        return f"{pre_base}/{svg.name}"
 
     piezas = []; omitidas = 0
     for s in secuencia:
@@ -265,9 +304,11 @@ def hornear(xs, f, salida, nombre="escena.json", excluir=None, grupo=None, conec
     if gradientes:
         meta["dibujos_con_gradiente"] = GRADS
     ruta_json = out / nombre
-    with open(ruta_json, "w", encoding="utf-8") as fh:
+    tmp_json = ruta_json.with_name(ruta_json.name + ".tmp")     # escritura atomica: un proceso matado a medias no deja un JSON truncado
+    with open(tmp_json, "w", encoding="utf-8") as fh:
         json.dump({"version": 2 if conectores else 1, "escena": xs, "fotograma": f, "camara": CAM, "tamano": [1920, 1080],
                    "avisos": avisos_glob, "apilado": meta, "piezas": piezas}, fh, indent=1, ensure_ascii=False)
+    _os.replace(tmp_json, ruta_json)
     resumen = {"json": str(ruta_json), "piezas": len(piezas), "con_recorte": sum(1 for p in piezas if p.get("recorte")),
                "omitidas": omitidas, "deformadas": len(DEFORMADAS), "avisos": len(avisos_glob)}
     return str(ruta_json), resumen

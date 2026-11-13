@@ -13,3 +13,5 @@ banco_pnp/
 prohibidos.local.txt
 !ejemplos/**/*.tvg
 !ejemplos/**/*.xstage
+target-*/
+dist/

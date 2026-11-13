@@ -1,6 +1,7 @@
 """CLI unica: python -m pegcraft <subcomando> ...   (ver (doc interna omitida)
 
   hornear         un fotograma -> escena.json + dibujos\\*.svg   (def.: conectores, matriz causal y deformadores = lo mejor validado)
+  hornear-rango   un rango de fotogramas en UN proceso -> <salida>\\fNNNN\\escena.json (SVG base compartidos en <salida>\\dibujos)
   ver             escena.xstage + fotograma -> PNG (hornea y dibuja de una vez)
   render          escena.json -> PNG con el crate pegcraft-render
   medir           px_ok / px_ok_personajes / (con --solo-ref --solo-mio) metrica de un grupo solo
@@ -8,6 +9,7 @@
   censo           deformadores (Offset/Curve) activos por READ
   diag-solos      pieza por pieza contra los `solo` de Harmony (caja, IoU, ECC, contorno)
   lamina          completa | tira | zonas
+  analizar        carpeta de planos -> log de lo que pegcraft no conoce o no soporta (jsonl + md + resumen.json)
 """
 import sys, json, argparse
 from pathlib import Path
@@ -27,13 +29,8 @@ def _zonas(lst):
     return z
 
 
-def main(argv=None):
-    ap = argparse.ArgumentParser(prog="python -m pegcraft", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    sp = ap.add_subparsers(dest="cmd", required=True)
-
-    h = sp.add_parser("hornear", help="hornear un fotograma")
-    h.add_argument("xstage"); h.add_argument("fotograma", type=int); h.add_argument("salida")
-    h.add_argument("--nombre", default="escena.json")
+def _opciones_hornear(h):
+    """Opciones comunes a `hornear` y `hornear-rango`."""
     h.add_argument("--excluir", default=None, help="regex de rutas de nodo que no se dibujan (por omision PEGCRAFT_EXCLUIR; vacia = ninguna)")
     h.add_argument("--grupo", default=None, help="solo piezas cuya ruta empieza asi (p. ej. Top/Personaje/)")
     h.add_argument("--conectores", choices=["si", "no"], default="si")
@@ -50,6 +47,30 @@ def main(argv=None):
     h.add_argument("--gradientes", choices=["si", "no"], default="si", help="def. si (validado 11-11-2026). rellenos Gradient (Linear/Radial) como SVG <linearGradient>; el crate los dibuja (doc interna omitida)")
     h.add_argument("--opacidad", choices=["leer", "ignorar"], default="leer")
     h.add_argument("--glow-suma", choices=["si", "no"], default="si", help="def. si (validado 11-11-2026, PLANO +0,28..+0,39): marca mezcla=suma en las piezas cuya rama pasa por un GLOW aditivo; el crate las suma por canal. Sin GLOW no cambia nada")
+
+
+def _kw_hornear(a):
+    """Argumentos de `hornear` (sin xstage/fotograma/salida/nombre) a partir de las opciones comunes."""
+    return dict(excluir=a.excluir, grupo=a.grupo, conectores=_si(a.conectores), exp=a.exp, z=a.z, apilado_modo=a.apilado, recortadas=a.recortadas,
+                camara=a.camara, desfase=a.desfase, desfase_grupo=a.desfase_grupo, carpeta=a.carpeta, opacidad=a.opacidad, matriz_causal=_si(a.causal),
+                deformadores=_si(a.deformadores), gradientes=_si(a.gradientes), glow_suma=_si(a.glow_suma))
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(prog="python -m pegcraft", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sp = ap.add_subparsers(dest="cmd", required=True)
+
+    h = sp.add_parser("hornear", help="hornear un fotograma")
+    h.add_argument("xstage"); h.add_argument("fotograma", type=int); h.add_argument("salida")
+    h.add_argument("--nombre", default="escena.json")
+    _opciones_hornear(h)
+
+    hr = sp.add_parser("hornear-rango", help="hornear un rango de fotogramas en un solo proceso (<salida>\\fNNNN\\escena.json; SVG base compartidos en <salida>\\dibujos)")
+    hr.add_argument("xstage"); hr.add_argument("salida")
+    hr.add_argument("--desde", type=int, default=1)
+    hr.add_argument("--hasta", default="todos", help="N o 'todos' (def.: hasta el ultimo fotograma de la escena)")
+    hr.add_argument("--paso", type=int, default=1)
+    _opciones_hornear(hr)
 
     v = sp.add_parser("ver", help="escena.xstage + fotograma -> PNG (hornea en una carpeta temporal y dibuja con pegcraft-render)")
     v.add_argument("xstage"); v.add_argument("fotograma", type=int); v.add_argument("-o", "--out", required=True, help="PNG de salida")
@@ -85,14 +106,19 @@ def main(argv=None):
     l.add_argument("--caja", default="auto"); l.add_argument("--escala", type=float, default=1.0)
     l.add_argument("--diff", default=None, help="i,j (tira)"); l.add_argument("--zona", action="append", help="nombre=x0,y0,x1,y1[,escala] (zonas)")
 
-
-
-
     co = sp.add_parser("compilar", help="escena -> plano nativo (tensores + sidecar x-harmony + almacen de activos; (doc interna omitida)")
     co.add_argument("xstage"); co.add_argument("--frames", required=True, help="A:B | n,m,k | todos"); co.add_argument("--salida", required=True)
     co.add_argument("--conservar-horneado", action="store_true")
     co.add_argument("--sin-residual", action="store_true", help="no escribir plano/harmony/ (arbol de origen exacto)")
     co.add_argument("--depurar-personal", action="store_true", help="SOLO si el autor lo pide: reemplaza username/realUsername y rutas absolutas en el arbol (rompe la identidad byte a byte)")
+    an = sp.add_parser("analizar", help="detecta lo que pegcraft no conoce o no soporta en una carpeta de planos (log jsonl + resumen md/json)")
+    an.add_argument("entradas", nargs="*", help="carpetas (recursivo) o .xstage; solo se leen")
+    an.add_argument("--verificar", default=None, metavar="ARCHIVO", help="NO analiza: revisa un *_compartible.json y sale con 1 si trae rutas, nombres, URLs, correos o texto libre")
+    an.add_argument("--escenas", default=None, help="con --verificar: carpeta con las escenas originales; ningun nombre de archivo, carpeta, nodo o columna puede aparecer")
+    an.add_argument("--planos", default=None, help="subconjunto: archivo con un .xstage por linea, o trozos de ruta separados por comas")
+    an.add_argument("--log", default=None, help="ruta base del log: escribe <base>.jsonl, <base>.md y <base>.resumen.json")
+    an.add_argument("--fotogramas", default="muestra", help="muestra (primero, medio, ultimo) | todos | A:B | n,m,k")
+    an.add_argument("--compartible", action="store_true", help="escribe ademas <base>_compartible.json: solo categoria, clave, conteos y versiones (sin rutas ni nombres)")
     vp = sp.add_parser("vuelta-plano", help="plano -> .xstage/.aux originales desde harmony/arbol.json.gz (byte a byte) [--editar REF=VALOR]")
     vp.add_argument("plano"); vp.add_argument("--salida", required=True)
     vp.add_argument("--editar", action="append", default=None, metavar="REF=VALOR", help="REF = id de harmony/mapa_ids.json (+/subruta y @atributo) o ruta del arbol; exige que cambie solo esa linea")
@@ -102,19 +128,41 @@ def main(argv=None):
     rp.add_argument("--salida-json", default=None); rp.add_argument("--f32", action="store_true", help="usar solo el tensor baked F32 (spec D-Tab)")
     rp.add_argument("--flags", nargs="*", default=None, help="flags del crate (def.: --aa-gauss 0.45 --ss 2 --opacidad-grupo)")
 
-
-
-
     a = ap.parse_args(argv)
     if a.cmd in ("compilar", "render-plano", "vuelta-plano"):
         from .compilar import cli as KC
         return KC.main(a)
+    if a.cmd == "analizar":
+        from .analisis import lote, verificar as V
+        if a.verificar:
+            return V.informar(V.verificar(a.verificar, a.escenas))
+        if not a.entradas or not a.log:
+            print("error: analizar necesita carpetas o .xstage y --log (o solo --verificar ARCHIVO)", file=sys.stderr)
+            return 2
+        try:
+            lote.analizar(a.entradas, a.log, a.planos, a.fotogramas, compartible=a.compartible)
+        except KeyboardInterrupt:
+            return 130
+        except lote.CompartibleContaminado as ex:
+            print("error: el log compartible no paso la verificacion y no se dejo el archivo", file=sys.stderr)
+            V.informar(ex.args[0], salida=lambda s: print(s, file=sys.stderr))
+            return 1
+        except FileNotFoundError as ex:
+            print(f"error: {ex}", file=sys.stderr)
+            return 2
+        return 0
     if a.cmd == "hornear":
         from .bake.hornear import hornear
-        _, res = hornear(a.xstage, a.fotograma, a.salida, nombre=a.nombre, excluir=a.excluir, grupo=a.grupo, conectores=_si(a.conectores), exp=a.exp,
-                         z=a.z, apilado_modo=a.apilado, recortadas=a.recortadas, camara=a.camara, desfase=a.desfase, desfase_grupo=a.desfase_grupo,
-                         carpeta=a.carpeta, opacidad=a.opacidad, matriz_causal=_si(a.causal), deformadores=_si(a.deformadores), gradientes=_si(a.gradientes), glow_suma=_si(a.glow_suma))
+        _, res = hornear(a.xstage, a.fotograma, a.salida, nombre=a.nombre, **_kw_hornear(a))
         print(json.dumps(res, ensure_ascii=False))
+    elif a.cmd == "hornear-rango":
+        from .bake.rango import hornear_rango
+        try:
+            res = hornear_rango(a.xstage, a.salida, a.desde, a.hasta, a.paso,
+                                avance=lambda i, n, f: print(f"fotograma {i}/{n} f={f}", flush=True), **_kw_hornear(a))
+        except KeyboardInterrupt:
+            return 130
+        print(json.dumps(res, ensure_ascii=False), flush=True)
     elif a.cmd == "ver":
         from .ver import ver
         print(ver(a.xstage, a.fotograma, a.out, a.bg))
