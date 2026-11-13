@@ -3,3 +3,5 @@
 # Un .xstage en cualquier otra ruta sigue bloqueado por extension.
 sightread/tests/fixtures/lector/
 ejemplos/escena_minima/
+# Capturas del README: solo de la escena sintetica de ejemplo (PNG sin metadatos, revisado a mano).
+docs/img/visor_escena_sintetica.png

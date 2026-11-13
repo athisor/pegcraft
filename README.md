@@ -19,6 +19,11 @@ pensado como base de un clon limpio del subconjunto *cutout* de ese formato.
 > No usa código ni documentación oficial del programa. **No está afiliado a Toon Boom Animation Inc.**
 > «Harmony» y «Toon Boom» son marcas de sus dueños y aquí solo describen el formato de archivo que se lee.
 
+![El visor de pegcraft con la escena sintética de ejemplo: capas, reproductor, vista de nodos con el nodo Circulo seleccionado, parámetros y línea de tiempo](docs/img/visor_escena_sintetica.png)
+
+*El visor con la escena de ejemplo (`ejemplos/escena_minima`, sintética): capas a la izquierda, reproductor con aceleración por GPU, vista de nodos con
+el READ `Circulo` seleccionado y su cadena de PEG resaltada, parámetros de la pieza y línea de tiempo.*
+
 ## Qué hay
 
 - `pegcraft/` — paquete Python: horneado de un fotograma (`bake`), compilador de escena a «plano» (`compilar`),
