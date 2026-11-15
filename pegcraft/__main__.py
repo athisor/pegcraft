@@ -10,6 +10,7 @@
   diag-solos      pieza por pieza contra los `solo` de Harmony (caja, IoU, ECC, contorno)
   lamina          completa | tira | zonas
   analizar        carpeta de planos -> log de lo que pegcraft no conoce o no soporta (jsonl + md + resumen.json)
+  dibujo          dibujo .tvg <-> modelo de dibujo editable (SVG con datos del trazo / JSON); --verificar = ida y vuelta
 """
 import sys, json, argparse
 from pathlib import Path
@@ -128,7 +129,15 @@ def main(argv=None):
     rp.add_argument("--salida-json", default=None); rp.add_argument("--f32", action="store_true", help="usar solo el tensor baked F32 (spec D-Tab)")
     rp.add_argument("--flags", nargs="*", default=None, help="flags del crate (def.: --aa-gauss 0.45 --ss 2 --opacidad-grupo)")
 
+    dj = sp.add_parser("dibujo", help="dibujo .tvg <-> modelo de dibujo editable (SVG con los datos del trazo, o JSON); --verificar comprueba la ida y vuelta (docs/formato/modelo-de-dibujo.md)")
+    dj.add_argument("entrada", help=".tvg, .svg o .json del modelo; con --verificar, un .tvg o una carpeta (solo lee)")
+    dj.add_argument("-o", "--svg", default=None, help="escribe la forma SVG"); dj.add_argument("--json", default=None, help="escribe la forma JSON")
+    dj.add_argument("--verificar", action="store_true"); dj.add_argument("--tope", type=int, default=0, help="con --verificar sobre una carpeta: muestra al azar de N dibujos (semilla fija)")
+
     a = ap.parse_args(argv)
+    if a.cmd == "dibujo":
+        from .dibujo import cli as DC
+        return DC.main(a)
     if a.cmd in ("compilar", "render-plano", "vuelta-plano"):
         from .compilar import cli as KC
         return KC.main(a)

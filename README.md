@@ -33,6 +33,9 @@ el READ `Circulo` seleccionado y su cadena de PEG resaltada, parámetros de la p
   Configuración de producción por entorno: `PEGCRAFT_EXCLUIR`, `PEGCRAFT_Z_EXCEPCIONES`.
   Reglas del horneado con interruptor por entorno (todas encendidas por omisión): `PEGCRAFT_READ_MATTE=no` (el puerto 1 de un READ es su matte),
   `PEGCRAFT_PEG_APAGADO=aplicar` (un PEG apagado no transforma; `aplicar` vuelve a contarlo en la cadena).
+- `pegcraft/dibujo/` — **modelo de dibujo editable** (v1): un dibujo como trazos con línea, grosor y color a cada lado, en JSON y en SVG con los datos del
+  trazo, con ida y vuelta comprobada (`python -m pegcraft dibujo … --verificar`). Decisión y especificación: [`docs/formato/modelo-de-dibujo.md`](docs/formato/modelo-de-dibujo.md).
+  No escribe archivos `.tvg`.
 - `crates/pegcraft-render` — rasterizador CPU (kurbo + tiny-skia) que dibuja el `escena.json` horneado.
 - `crates/pegcraft-gpu` — spike de rasterizado por GPU (vello sobre wgpu).
 - `crates/pegcraft-viewer`, `crates/pegcraft-viewer-craft` — visores de prueba (egui).
