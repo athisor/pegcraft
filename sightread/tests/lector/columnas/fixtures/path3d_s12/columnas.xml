@@ -1,0 +1,68 @@
+<project>
+ <elements>
+  <element id="2" elementName="Drawing" elementFolder="Drawing.2" pixmapFormat="2" scanType="2" fieldChart="12" vectorType="2" rootFolder="elements" />
+ </elements>
+ <options>
+  <metrics unitAspectRatioX="4" unitAspectRatioY="3" numberOfUnitsX="24" numberOfUnitsY="24" numberOfUnitsZ="12" />
+ </options>
+ <scenes>
+  <scene name="Top" nbframes="60">
+   <columns>
+    <column type="0" name="Drawing" displayOrder="0" width="100" anonymous="true" id="2" />
+    <column type="2" name="C_val1" anonymous="false" displayOrder="0">
+     <infoX width="100" />
+     <infoY width="100" />
+     <infoZ width="100" />
+     <infoVelocity width="100" />
+     <path3D useVeloX="true" useVeloY="true" useVeloZ="true" constantZ="false">
+      <points>
+       <pt val="-1.5,0.69999999999999996,0.20000000000000001" lockedInTime="3" />
+       <pt val="1.2,3.1000000000000001,-0.40000000000000002" tension="0.29999999999999999" continuity="-0.20000000000000001" bias="0.10000000000000001" lockedInTime="10" />
+       <pt val="4.4000000000000004,2.2000000000000002,0.90000000000000002" continuity="0.40000000000000002" bias="-0.29999999999999999" lockedInTime="17" />
+       <pt val="2.5,-1.8,1.6000000000000001" tension="-0.5" bias="0.59999999999999998" lockedInTime="29" />
+       <pt val="-0.80000000000000004,-0.59999999999999998,0.29999999999999999" lockedInTime="36" />
+       <pt val="0.40000000000000002,2.8999999999999999,-1.1000000000000001" lockedInTime="48" />
+      </points>
+     </path3D>
+     <velocity type="3" name="ATV-0D4D5BB248BCCD2188C00096" displayOrder="0" width="100" anonymous="true">
+      <step val="1" start="1" stop="1" />
+      <noFrames />
+      <points version="2">
+       <pt constSeg="false" x="3" yLocal="0" y="0" rhx="0.45000000000000001" rhy="0.050000000000000003" rx="6.1500000000000004" ry="0.0083257054433651771" />
+       <pt constSeg="false" x="10" yLocal="0.16651410886730353" y="0.16651410886730353" />
+       <pt constSeg="false" x="17" yLocal="0.38172807481336418" y="0.38172807481336418" rhx="0.14999999999999999" rhy="0.34999999999999998" lhx="0.29999999999999999" lhy="0.59999999999999998" rx="18.800000000000001" ry="0.44760485457885524" lx="14.9" ly="0.25259969524572778" />
+       <pt constSeg="false" x="29" yLocal="0.56994744557191013" y="0.56994744557191013" />
+       <pt constSeg="false" x="36" yLocal="0.80118035696963552" y="0.80118035696963552" rhx="0.25" rhy="0.80000000000000004" lhx="0.69999999999999996" lhy="0.20000000000000001" rx="39" ry="0.96023607139392708" lx="31.100000000000001" ly="0.75493377469009049" />
+       <pt constSeg="false" x="48" yLocal="1" y="1" lhx="0.20000000000000001" lhy="0.10000000000000001" lx="45.600000000000001" ly="0.98011803569696354" />
+      </points>
+     </velocity>
+    </column>
+    <column type="2" name="C_val2" anonymous="false" displayOrder="0">
+     <infoX width="100" />
+     <infoY width="100" />
+     <infoZ width="100" />
+     <infoVelocity width="100" />
+     <path3D useVeloX="true" useVeloY="true" useVeloZ="true" constantZ="false">
+      <points>
+       <pt val="0.5,-2,1" lockedInTime="2" />
+       <pt val="3.7000000000000002,0.40000000000000002,0.20000000000000001" tension="0.20000000000000001" continuity="0.10000000000000001" lockedInTime="14" />
+       <pt val="0.90000000000000002,0.20000000000000001,0" />
+       <pt val="-2.1000000000000001,3.2999999999999998,-0.69999999999999996" lockedInTime="27" />
+       <pt val="1.8999999999999999,1.1000000000000001,0.80000000000000004" lockedInTime="40" />
+      </points>
+     </path3D>
+     <velocity type="3" name="ATV-0D985B6748F4CD8F88C00098" displayOrder="0" width="100" anonymous="true">
+      <step val="1" start="1" stop="1" />
+      <noFrames />
+      <points version="2">
+       <pt constSeg="false" x="2" yLocal="0" y="0" />
+       <pt constSeg="false" x="14" yLocal="0.24946262630649346" y="0.24946262630649346" lhx="0.33000000000000002" lhy="0.40000000000000002" lx="10.039999999999999" ly="0.14967757578389607" />
+       <pt constSeg="false" x="40" yLocal="1" y="1" />
+       <pt constSeg="true" x="27" yLocal="0.67596321695329709" y="0.67596321695329709" />
+      </points>
+     </velocity>
+    </column>
+   </columns>
+  </scene>
+ </scenes>
+</project>

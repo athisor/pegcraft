@@ -1,0 +1,157 @@
+{
+ "caso": "c13_saltos_linea_atributo",
+ "version_formato": 1,
+ "descripcion": "Saltos de linea dentro de un atributo: uno crudo (como Harmony escribe scriptEditor) y otro como &#10;.",
+ "origen": "regla",
+ "origen_por_bloque": {
+  "grafo": "regla",
+  "atributos": "regla",
+  "evaluacion": "regla",
+  "medicion": "harmony"
+ },
+ "medicion": {
+  "estado": "medido",
+  "origen": "harmony",
+  "version_harmony": "24.0.2 build 23443",
+  "fecha": "2026-11-12",
+  "metodo": "medido en Harmony 24 (-batch) sobre una copia de una escena vacia creada por el usuario, a la que se le inserto el contenido del caso editando su XML; la firma de la escena del usuario se conserva sin tocar. Lectura: getMatrix por nodo y atributo DRAWING; render solo en los casos de apagado",
+  "metricas": [
+   4,
+   3,
+   24,
+   24,
+   12
+  ],
+  "K": [
+   0.1111111111111111,
+   0.08333333333333333,
+   0.2222222222222222
+  ],
+  "error_lectura": {
+   "matriz_campos_xy": 5.1e-06,
+   "z_campos": 6.866455078125e-05,
+   "nota": "xy: error de lectura de getMatrix en espacio de matriz; z cuantizada a 1/65536 en espacio de matriz"
+  },
+  "unidades": "matriz y z en campos: F = D^-1 M D con D = diag(KX,KY,KZ,1); matriz = [[a,b,tx],[c,d,ty]]",
+  "nodos": {},
+  "atributos_texto_en_harmony": {
+   "Top/Escritura_1": {
+    "scriptEditor": "linea uno\nlinea dos\n\nlinea cuatro"
+   },
+   "Top/Escritura_2": {
+    "scriptEditor": "alfa\nbeta\r\ngamma"
+   }
+  },
+  "atributos_texto_coinciden": true,
+  "reinterpretacion_al_guardar": {
+   "nodos_antes": 4,
+   "nodos_despues": 4,
+   "cables_antes": 3,
+   "cables_despues": 3,
+   "diferencias": []
+  },
+  "discrepancias_con_regla_paridad": [],
+  "notas": [
+   "Harmony conserva el texto de scriptEditor tal cual: LF, CRLF, lineas vacias; el salto crudo y &#10;/&#13; dan el mismo texto que el esperado."
+  ]
+ },
+ "escena": {
+  "fotogramas": 24,
+  "fps": 24
+ },
+ "nodos": [
+  {
+   "ruta": "Top/Escritura_1",
+   "tipo": "WRITE",
+   "nombre": "Escritura_1",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Escritura_2",
+   "tipo": "WRITE",
+   "nombre": "Escritura_2",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Composite",
+   "tipo": "COMPOSITE",
+   "nombre": "Composite",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pantalla",
+   "tipo": "DISPLAY",
+   "nombre": "Pantalla",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  }
+ ],
+ "cables_literales": [
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Pantalla",
+   0
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Escritura_1",
+   0
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Escritura_2",
+   0
+  ]
+ ],
+ "fuentes": {
+  "Top/Escritura_1": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  },
+  "Top/Escritura_2": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  },
+  "Top/Pantalla": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  }
+ },
+ "puertos_composite": {},
+ "atributos": {
+  "Top/Escritura_1": {
+   "scriptEditor": "linea uno\nlinea dos\n\nlinea cuatro"
+  },
+  "Top/Escritura_2": {
+   "scriptEditor": "alfa\nbeta\r\ngamma"
+  }
+ },
+ "evaluacion": {
+  "1": {}
+ }
+}

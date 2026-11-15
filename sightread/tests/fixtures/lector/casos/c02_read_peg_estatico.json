@@ -1,0 +1,21 @@
+{
+ "nombre": "c02_read_peg_estatico",
+ "descripcion": "READ colgado de un PEG estatico (escala 2 x 0,5); dibujo 1 expuesto en todos los cuadros.",
+ "fotogramas": 24,
+ "evaluar": [1, 12, 24],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1", "2"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-24", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_A", "attrs": {"scale/x": 2, "scale/y": 0.5}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_A", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

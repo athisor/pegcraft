@@ -1,0 +1,296 @@
+{
+ "caso": "c12_read_transformacion_propia",
+ "version_formato": 1,
+ "descripcion": "READ con transformacion propia (escala x 2, rotacion -90, offset z 0,25) bajo un PEG que gira 90.",
+ "origen": "paridad",
+ "origen_por_bloque": {
+  "grafo": "regla",
+  "atributos": "regla",
+  "evaluacion": "paridad",
+  "medicion": "harmony"
+ },
+ "medicion": {
+  "estado": "medido",
+  "origen": "harmony",
+  "version_harmony": "24.0.2 build 23443",
+  "fecha": "2026-11-12",
+  "metodo": "medido en Harmony 24 (-batch) sobre una copia de una escena vacia creada por el usuario, a la que se le inserto el contenido del caso editando su XML; la firma de la escena del usuario se conserva sin tocar. Lectura: getMatrix por nodo y atributo DRAWING; render solo en los casos de apagado",
+  "metricas": [
+   4,
+   3,
+   24,
+   24,
+   12
+  ],
+  "K": [
+   0.1111111111111111,
+   0.08333333333333333,
+   0.2222222222222222
+  ],
+  "error_lectura": {
+   "matriz_campos_xy": 5.1e-06,
+   "z_campos": 6.866455078125e-05,
+   "nota": "xy: error de lectura de getMatrix en espacio de matriz; z cuantizada a 1/65536 en espacio de matriz"
+  },
+  "unidades": "matriz y z en campos: F = D^-1 M D con D = diag(KX,KY,KZ,1); matriz = [[a,b,tx],[c,d,ty]]",
+  "nodos": {
+   "Top/Peg_P": {
+    "tipo": "PEG",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        0.0,
+        -0.75,
+        0.0
+       ],
+       [
+        1.3333333,
+        0.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.3333333,
+      "dif_posicion_vs_canales": 0.0,
+      "dif_vs_esperado_z": 0.0
+     }
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        2.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.2500076,
+      "dibujo_expuesto": "elements/Dibujo_A/Dibujo_A-1.tvg",
+      "error_vs_modelo_harmony": 1.7e-06,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.0,
+      "dif_vs_esperado_z": 7.6e-06,
+      "dibujo_esperado": "elements/Dibujo_A/Dibujo_A-1.tvg"
+     }
+    }
+   }
+  },
+  "reinterpretacion_al_guardar": {
+   "nodos_antes": 4,
+   "nodos_despues": 4,
+   "cables_antes": 3,
+   "cables_despues": 3,
+   "diferencias": []
+  },
+  "discrepancias_con_regla_paridad": [
+   "f1 Top/Peg_P: matriz medida [[0.0, -0.75, 0.0], [1.3333333, 0.0, 0.0]] vs compatibilidad [[0.0, -1.0, 0.0], [1.0, 0.0, 0.0]] (dif 0.3333)"
+  ],
+  "notas": [
+   "La matriz de compatibilidad (isotropa, en campos) difiere de la medida donde hay rotacion: Harmony compone en espacio de matriz (A4-02) y F = D^-1 M D deja factores KY/KX = 0,75 y KX/KY = 1,333 (aspecto 4:3) en los terminos cruzados. Coinciden donde las rotaciones se cancelan o no hay.",
+   "El READ (escala x 2, rotacion -90, offset z 0,25 bajo un PEG a 90) coincide con el modo de compatibilidad: R6 confirmada (error 1,7e-6)."
+  ]
+ },
+ "escena": {
+  "fotogramas": 24,
+  "fps": 24
+ },
+ "nodos": [
+  {
+   "ruta": "Top/Peg_P",
+   "tipo": "PEG",
+   "nombre": "Peg_P",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Dibujo_A",
+   "tipo": "READ",
+   "nombre": "Dibujo_A",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Composite",
+   "tipo": "COMPOSITE",
+   "nombre": "Composite",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pantalla",
+   "tipo": "DISPLAY",
+   "nombre": "Pantalla",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  }
+ ],
+ "cables_literales": [
+  [
+   "Top",
+   "Top/Peg_P",
+   0,
+   "Top/Dibujo_A",
+   0
+  ],
+  [
+   "Top",
+   "Top/Dibujo_A",
+   0,
+   "Top/Composite",
+   0
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Pantalla",
+   0
+  ]
+ ],
+ "fuentes": {
+  "Top/Dibujo_A": {
+   "0": [
+    [
+     "Top/Peg_P",
+     0
+    ]
+   ]
+  },
+  "Top/Composite": {
+   "0": [
+    [
+     "Top/Dibujo_A",
+     0
+    ]
+   ]
+  },
+  "Top/Pantalla": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  }
+ },
+ "puertos_composite": {
+  "Top/Composite": [
+   0
+  ]
+ },
+ "atributos": {},
+ "evaluacion": {
+  "1": {
+   "Top/Peg_P": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_P"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 90.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.0
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Dibujo_A": {
+    "tipo": "READ",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Dibujo_A",
+     "Top/Peg_P"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 2.0,
+     "escala.y": 1.0,
+     "rotacion": -90.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 0.0,
+     "offset.z": 0.25
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_A",
+     "carpeta": "Dibujo_A",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_A/Dibujo_A-1.tvg"
+    },
+    "z": 0.25,
+    "matriz": [
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  }
+ }
+}

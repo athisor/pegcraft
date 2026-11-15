@@ -1,0 +1,23 @@
+{
+ "nombre": "c09_puntos_coincidentes",
+ "descripcion": "Trayectoria 3D con tres puntos consecutivos iguales (cuerdas de longitud nula); provoca ZeroDivisionError en lectores ingenuos.",
+ "fotogramas": 13,
+ "evaluar": [1, 11, 13],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-13", "dibujo": "1"}]},
+  {"nombre": "Col_Tray", "tipo": 2, "puntos": [
+   {"v": [0, 0, 0], "t": 1}, {"v": [1, 0, 0], "t": 5}, {"v": [1, 0, 0], "t": 9}, {"v": [1, 0, 0], "t": 13}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_A", "attrs": {"position/attr3dpath": {"col": "Col_Tray"}}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_A", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

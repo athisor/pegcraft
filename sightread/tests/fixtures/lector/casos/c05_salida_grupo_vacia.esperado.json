@@ -1,0 +1,242 @@
+{
+ "caso": "c05_salida_grupo_vacia",
+ "version_formato": 1,
+ "descripcion": "Grupo_1 con dos salidas; la salida 1 del MULTIPORT_OUT no tiene cable interior (salida vacia) y el composite la recibe.",
+ "origen": "paridad",
+ "origen_por_bloque": {
+  "grafo": "regla",
+  "atributos": "regla",
+  "evaluacion": "paridad",
+  "medicion": "harmony"
+ },
+ "medicion": {
+  "estado": "medido",
+  "origen": "harmony",
+  "version_harmony": "24.0.2 build 23443",
+  "fecha": "2026-11-12",
+  "metodo": "medido en Harmony 24 (-batch) sobre una copia de una escena vacia creada por el usuario, a la que se le inserto el contenido del caso editando su XML; la firma de la escena del usuario se conserva sin tocar. Lectura: getMatrix por nodo y atributo DRAWING; render solo en los casos de apagado",
+  "metricas": [
+   4,
+   3,
+   24,
+   24,
+   12
+  ],
+  "K": [
+   0.1111111111111111,
+   0.08333333333333333,
+   0.2222222222222222
+  ],
+  "error_lectura": {
+   "matriz_campos_xy": 5.1e-06,
+   "z_campos": 6.866455078125e-05,
+   "nota": "xy: error de lectura de getMatrix en espacio de matriz; z cuantizada a 1/65536 en espacio de matriz"
+  },
+  "unidades": "matriz y z en campos: F = D^-1 M D con D = diag(KX,KY,KZ,1); matriz = [[a,b,tx],[c,d,ty]]",
+  "nodos": {
+   "Top/Grupo_1/Dibujo_G": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_G/Dibujo_G-1.tvg",
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.0,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_G/Dibujo_G-1.tvg"
+     }
+    }
+   }
+  },
+  "reinterpretacion_al_guardar": {
+   "nodos_antes": 5,
+   "nodos_despues": 5,
+   "cables_antes": 4,
+   "cables_despues": 4,
+   "diferencias": []
+  },
+  "discrepancias_con_regla_paridad": [],
+  "notas": []
+ },
+ "escena": {
+  "fotogramas": 24,
+  "fps": 24
+ },
+ "nodos": [
+  {
+   "ruta": "Top/Grupo_1",
+   "tipo": "GROUP",
+   "nombre": "Grupo_1",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_1/Multi-Port-Out",
+   "tipo": "MULTIPORT_OUT",
+   "nombre": "Multi-Port-Out",
+   "padre": "Grupo_1",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_1/Dibujo_G",
+   "tipo": "READ",
+   "nombre": "Dibujo_G",
+   "padre": "Grupo_1",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Composite",
+   "tipo": "COMPOSITE",
+   "nombre": "Composite",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pantalla",
+   "tipo": "DISPLAY",
+   "nombre": "Pantalla",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  }
+ ],
+ "cables_literales": [
+  [
+   "Top/Grupo_1",
+   "Top/Grupo_1/Dibujo_G",
+   0,
+   "Top/Grupo_1/Multi-Port-Out",
+   0
+  ],
+  [
+   "Top",
+   "Top/Grupo_1",
+   0,
+   "Top/Composite",
+   0
+  ],
+  [
+   "Top",
+   "Top/Grupo_1",
+   1,
+   "Top/Composite",
+   1
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Pantalla",
+   0
+  ]
+ ],
+ "fuentes": {
+  "Top/Grupo_1/Multi-Port-Out": {
+   "0": [
+    [
+     "Top/Grupo_1/Dibujo_G",
+     0
+    ]
+   ]
+  },
+  "Top/Composite": {
+   "0": [
+    [
+     "Top/Grupo_1/Dibujo_G",
+     0
+    ]
+   ],
+   "1": [
+    [
+     "Top/Grupo_1",
+     1
+    ]
+   ]
+  },
+  "Top/Pantalla": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  }
+ },
+ "puertos_composite": {
+  "Top/Composite": [
+   0,
+   1
+  ]
+ },
+ "atributos": {},
+ "evaluacion": {
+  "1": {
+   "Top/Grupo_1/Dibujo_G": {
+    "tipo": "READ",
+    "padre": "Grupo_1",
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 0.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_G",
+     "carpeta": "Dibujo_G",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_G/Dibujo_G-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  }
+ }
+}

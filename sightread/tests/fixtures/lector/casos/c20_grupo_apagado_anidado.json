@@ -1,0 +1,55 @@
+{
+ "nombre": "c20_grupo_apagado_anidado",
+ "descripcion": "Cuatro READ (escala 0,25, cada uno en su casilla): control fuera de grupos; Grupo_Ext_Off (apagado) con Grupo_Int_On dentro; Grupo_Ext_On con Grupo_Int_Off (apagado) dentro; Grupo_Ext_On2 con Grupo_Int_On2 (ambos encendidos).",
+ "fotogramas": 12,
+ "evaluar": [1],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-12", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "READ", "nombre": "Dibujo_Control", "attrs": {"drawing/element": {"col": "Col_Dibujo"}, "scale/x": 0.25, "scale/y": 0.25, "offset/x": -6}},
+  {"tipo": "GROUP", "nombre": "Grupo_Ext_Off", "apagado": true,
+   "nodos": [
+    {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}]},
+    {"tipo": "GROUP", "nombre": "Grupo_Int_On",
+     "nodos": [
+      {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}]},
+      {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}, "scale/x": 0.25, "scale/y": 0.25, "offset/x": 0, "offset/y": 4}}
+     ],
+     "enlaces": [{"origen": "Dibujo_A", "destino": "Multi-Port-Out"}]}
+   ],
+   "enlaces": [{"origen": "Grupo_Int_On", "destino": "Multi-Port-Out"}]},
+  {"tipo": "GROUP", "nombre": "Grupo_Ext_On",
+   "nodos": [
+    {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}]},
+    {"tipo": "GROUP", "nombre": "Grupo_Int_Off", "apagado": true,
+     "nodos": [
+      {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}]},
+      {"tipo": "READ", "nombre": "Dibujo_B", "attrs": {"drawing/element": {"col": "Col_Dibujo"}, "scale/x": 0.25, "scale/y": 0.25, "offset/x": 6, "offset/y": 4}}
+     ],
+     "enlaces": [{"origen": "Dibujo_B", "destino": "Multi-Port-Out"}]}
+   ],
+   "enlaces": [{"origen": "Grupo_Int_Off", "destino": "Multi-Port-Out"}]},
+  {"tipo": "GROUP", "nombre": "Grupo_Ext_On2",
+   "nodos": [
+    {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}]},
+    {"tipo": "GROUP", "nombre": "Grupo_Int_On2",
+     "nodos": [
+      {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}]},
+      {"tipo": "READ", "nombre": "Dibujo_C", "attrs": {"drawing/element": {"col": "Col_Dibujo"}, "scale/x": 0.25, "scale/y": 0.25, "offset/x": 0, "offset/y": -6}}
+     ],
+     "enlaces": [{"origen": "Dibujo_C", "destino": "Multi-Port-Out"}]}
+   ],
+   "enlaces": [{"origen": "Grupo_Int_On2", "destino": "Multi-Port-Out"}]},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Dibujo_Control", "destino": "Composite", "puerto_destino": 0},
+  {"origen": "Grupo_Ext_Off", "destino": "Composite", "puerto_destino": 1},
+  {"origen": "Grupo_Ext_On", "destino": "Composite", "puerto_destino": 2},
+  {"origen": "Grupo_Ext_On2", "destino": "Composite", "puerto_destino": 3},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

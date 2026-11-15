@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+# Escenas y dibujos de produccion: no entran nunca. Solo los sinteticos de tests/ se versionan.
+*.xstage
+*.tvg
+*.plt
+*.rar
+prohibidos.local.txt
+!tests/**/*.xstage
+!tests/**/*.tvg
+!tests/**/*.plt

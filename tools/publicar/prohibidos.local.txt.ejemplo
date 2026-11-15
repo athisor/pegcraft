@@ -1,0 +1,9 @@
+# Copiar a prohibidos.local.txt (NO versionar: esta ignorado) y poner ahi los nombres que no deben salir al repo publico.
+# Una expresion regular por linea, sin distinguir mayusculas; `#` solo comenta al inicio de la linea.
+# Se busca en el contenido de cada archivo y tambien en su ruta.
+# Pasarlo con:  python tools/publicar/publicar.py --destino <carpeta> --prohibidos tools/publicar/prohibidos.local.txt
+#
+# Ejemplos inventados (sustituir por los nombres reales; no escribir aqui nada real):
+\bPersonaje_Ejemplo\b
+\bSerie_Ejemplo\b
+\bEP99_\d{4}\b

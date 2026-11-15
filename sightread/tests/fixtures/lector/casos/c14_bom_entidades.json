@@ -1,0 +1,22 @@
+{
+ "nombre": "c14_bom_entidades",
+ "descripcion": "BOM UTF-8 al inicio; nombres con & y no ASCII (escritos como &#NNN;) y atributo con < > \" &.",
+ "fotogramas": 24,
+ "evaluar": [1],
+ "codificacion": {"bom": true, "entidades_numericas": true},
+ "atributos_texto": [
+  {"nodo": "Escritura", "ruta": ["scriptEditor"]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Pieza_A&B"},
+  {"tipo": "PEG", "nombre": "Pieza_Ñandú"},
+  {"tipo": "WRITE", "nombre": "Escritura", "attrs": {"scriptEditor": "si a < b & c > d entonces \"ok\" éñ"}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Pieza_A&B", "destino": "Pieza_Ñandú"},
+  {"origen": "Composite", "destino": "Pantalla"},
+  {"origen": "Composite", "destino": "Escritura"}
+ ]
+}

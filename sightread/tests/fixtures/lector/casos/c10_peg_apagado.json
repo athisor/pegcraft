@@ -1,0 +1,23 @@
+{
+ "nombre": "c10_peg_apagado",
+ "descripcion": "Peg_Apagado (apagado, z 0,5, escala x 2) en la cadena de un READ: la regla R7 cuenta su Z y su matriz.",
+ "fotogramas": 24,
+ "evaluar": [1, 24],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-24", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_Apagado", "apagado": true, "attrs": {"position/z": 0.5, "scale/x": 2}},
+  {"tipo": "PEG", "nombre": "Peg_Hijo", "attrs": {"position/z": 0.25}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_Apagado", "destino": "Peg_Hijo"},
+  {"origen": "Peg_Hijo", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

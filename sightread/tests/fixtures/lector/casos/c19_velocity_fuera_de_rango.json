@@ -1,0 +1,30 @@
+{
+ "nombre": "c19_velocity_fuera_de_rango",
+ "descripcion": "Trayectoria 3D de 3 puntos (llaves en 1, 13, 25) con velocity en llaves fijas cuya y sale de [0,1]: 1,3 en el cuadro 7 y -0,3 en el 19.",
+ "fotogramas": 25,
+ "evaluar": [1, 4, 7, 10, 13, 16, 19, 22, 25],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-25", "dibujo": "1"}]},
+  {"nombre": "Col_Tray", "tipo": 2,
+   "puntos": [{"v": [0, 0, 0], "t": 1}, {"v": [4, 2, 0.5], "t": 13}, {"v": [8, 0, 1], "t": 25}],
+   "velocidad": {"puntos": [
+    {"x": "1", "y": 0.0, "constSeg": false},
+    {"x": "7", "y": 1.3, "constSeg": false},
+    {"x": "13", "y": 0.5, "constSeg": false},
+    {"x": "19", "y": -0.3, "constSeg": false},
+    {"x": "25", "y": 1.0, "constSeg": false}
+   ]}}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_A", "attrs": {"position/attr3dpath": {"col": "Col_Tray"}}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_A", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

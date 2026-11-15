@@ -1,0 +1,27 @@
+{
+ "nombre": "c05_salida_grupo_vacia",
+ "descripcion": "Grupo_1 con dos salidas; la salida 1 del MULTIPORT_OUT no tiene cable interior (salida vacia) y el composite la recibe.",
+ "fotogramas": 24,
+ "evaluar": [1],
+ "elementos": [{"id": 2, "nombre": "Dibujo_G", "carpeta": "Dibujo_G", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-24", "dibujo": "1"}]}
+ ],
+ "nodos": [
+  {"tipo": "GROUP", "nombre": "Grupo_1",
+   "nodos": [
+    {"tipo": "MULTIPORT_OUT", "nombre": "Multi-Port-Out", "puertos": [{"tipo": "IMAGE", "idx": 0}, {"tipo": "IMAGE", "idx": 1}]},
+    {"tipo": "READ", "nombre": "Dibujo_G", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}}
+   ],
+   "enlaces": [
+    {"origen": "Dibujo_G", "destino": "Multi-Port-Out", "puerto_destino": 0}
+   ]},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Grupo_1", "destino": "Composite", "puerto_origen": 0, "puerto_destino": 0},
+  {"origen": "Grupo_1", "destino": "Composite", "puerto_origen": 1, "puerto_destino": 1},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

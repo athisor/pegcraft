@@ -1,0 +1,28 @@
+{
+ "nombre": "c03_cadena_dos_peg",
+ "descripcion": "Cadena Peg_Padre (rotacion animada 0-30-60) -> Peg_Hijo (escala x 2) -> READ.",
+ "fotogramas": 25,
+ "evaluar": [1, 7, 25],
+ "elementos": [{"id": 2, "nombre": "Dibujo_A", "carpeta": "Dibujo_A", "dibujos": ["1"]}],
+ "columnas": [
+  {"nombre": "Col_Dibujo", "tipo": 0, "elemento": 2, "secuencias": [{"cuadros": "1-25", "dibujo": "1"}]},
+  {"nombre": "Col_Rot", "tipo": 3, "puntos": [
+   {"x": "1", "y": 0.0, "constSeg": false},
+   {"x": "13", "y": 30.0, "constSeg": false},
+   {"x": "25", "y": 60.0, "constSeg": false}
+  ]}
+ ],
+ "nodos": [
+  {"tipo": "PEG", "nombre": "Peg_Padre", "attrs": {"rotation/anglez": {"val": 0, "col": "Col_Rot"}}},
+  {"tipo": "PEG", "nombre": "Peg_Hijo", "attrs": {"scale/x": 2}},
+  {"tipo": "READ", "nombre": "Dibujo_A", "attrs": {"drawing/element": {"col": "Col_Dibujo"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Peg_Padre", "destino": "Peg_Hijo"},
+  {"origen": "Peg_Hijo", "destino": "Dibujo_A"},
+  {"origen": "Dibujo_A", "destino": "Composite"},
+  {"origen": "Composite", "destino": "Pantalla"}
+ ]
+}

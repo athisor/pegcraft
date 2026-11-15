@@ -1,0 +1,178 @@
+<project>
+ <elements>
+  <element id="2" elementName="Drawing" elementFolder="Drawing.2" pixmapFormat="2" scanType="2" fieldChart="12" vectorType="2" rootFolder="elements" />
+  <element id="3" elementName="EA" elementFolder="EA" pixmapFormat="2" scanType="0" fieldChart="12" vectorType="2" rootFolder="elements">
+   <drawings>
+    <dwg name="1" />
+    <dwg name="2" />
+    <dwg name="3" />
+    <dwg name="4" />
+    <dwg name="5" />
+    <dwg name="6" />
+    <dwg name="a" />
+    <dwg name="b" />
+    <dwg name="01" />
+   </drawings>
+  </element>
+  <element id="4" elementName="EB" elementFolder="EB" pixmapFormat="2" scanType="0" fieldChart="12" vectorType="2" rootFolder="elements">
+   <drawings>
+    <dwg name="1" />
+    <dwg name="2" />
+    <dwg name="3" />
+    <dwg name="4" />
+    <dwg name="5" />
+    <dwg name="6" />
+    <dwg name="a" />
+    <dwg name="b" />
+    <dwg name="01" />
+   </drawings>
+  </element>
+ </elements>
+ <options>
+  <metrics unitAspectRatioX="4" unitAspectRatioY="3" numberOfUnitsX="24" numberOfUnitsY="24" numberOfUnitsZ="12" />
+ </options>
+ <scenes>
+  <scene name="Top" nbframes="60">
+   <columns>
+    <column type="0" name="Drawing" displayOrder="0" width="100" anonymous="true" id="2" />
+    <column type="0" name="K01" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="41,46,43" val="b" />
+     <elementSeq exposures="47,58" val="1" id="4" />
+     <elementSeq exposures="45" val="1" id="3" />
+     <elementSeq exposures="19-22,74,4-5" val="6" />
+    </column>
+    <column type="0" name="K02" displayOrder="0" width="100" anonymous="true" id="3">
+     <heldSeq exposures=",1-" />
+     <elementSeq exposures="29-32" val="a" id="4" />
+     <elementSeq exposures="007,56" val="1" />
+    </column>
+    <column type="0" name="K03" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="27,66" val="5" id="3" />
+     <elementSeq exposures="007" val="6" />
+     <elementSeq exposures="9-10,65,38-38" val="a" />
+     <elementSeq exposures="16-22,26-26,9" val="4" />
+     <heldSeq exposures="50-52,54" />
+    </column>
+    <column type="0" name="K04" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="69,3-6" val="b" />
+     <elementSeq exposures="40,17-18,56" val="a" />
+    </column>
+    <column type="0" name="K05" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="-4" val="2" id="4" />
+     <elementSeq exposures="17-23,6-18" val="2" id="4" />
+     <elementSeq exposures="7-7" val="b" />
+     <heldSeq exposures="63,69-72,54" />
+     <elementSeq exposures="52-64,0-2" val="6" />
+    </column>
+    <column type="0" name="K06" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="1-,12-24,59" val="b" />
+     <elementSeq exposures="33-39,62" val="b" />
+     <elementSeq exposures="60,45" val="b" />
+    </column>
+    <column type="0" name="K07" displayOrder="0" width="100" anonymous="true" id="3">
+     <heldSeq exposures="40-52,23,62-62" />
+     <elementSeq exposures="2,26" val="1" />
+    </column>
+    <column type="0" name="K08" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="40,10" val="1" />
+     <elementSeq exposures="24-36,007,37" val="4" id="3" />
+     <elementSeq exposures="0" val="5" id="3" />
+    </column>
+    <column type="0" name="K09" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="42,62-68,62" val="5" />
+     <elementSeq exposures="51-52,13-13,15-16" val="b" id="4" />
+     <elementSeq exposures="63-66,1-,42" val="1" id="3" />
+    </column>
+    <column type="0" name="K10" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="69,67-70" val="6" />
+     <elementSeq exposures="63-65,3.5" val="01" />
+    </column>
+    <column type="0" name="K11" displayOrder="0" width="100" anonymous="true" id="3">
+     <heldSeq exposures="8" />
+     <elementSeq exposures="24-36,46,56-68" val="01" id="3" />
+     <elementSeq exposures="43,46" val="4" />
+    </column>
+    <column type="0" name="K12" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="44,38-44" val="4" />
+     <heldSeq exposures="74-77" />
+     <elementSeq exposures="33-34,6" val="1" />
+     <heldSeq exposures="4-7,25" />
+     <elementSeq exposures="33" val="1" id="3" />
+    </column>
+    <column type="0" name="K13" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="65-66,28,64-67" val="01" />
+     <elementSeq exposures="007" val="1" />
+     <elementSeq exposures="34,2-2,37" val="b" />
+     <elementSeq exposures="47-48,3.5" val="6" id="4" />
+     <elementSeq exposures="-4,3,21" val="1" />
+    </column>
+    <column type="0" name="K14" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="40-40,58,18-24" val="5" />
+     <elementSeq exposures="33-36" val="6" />
+     <elementSeq exposures="15,1" val="01" id="4" />
+    </column>
+    <column type="0" name="K15" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="46,34-40,46" val="6" id="2" />
+     <elementSeq exposures="6-18,52,40-46" val="1" id="4" />
+     <heldSeq exposures="63,10-22,42-44" />
+     <elementSeq exposures="6-3,53-55,3-4" val="2" />
+    </column>
+    <column type="0" name="K16" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="68-71,1-" val="5" id="4" />
+     <elementSeq exposures="21,,70" val="3" id="3" />
+     <elementSeq exposures="2-5" val="4" id="3" />
+     <elementSeq exposures="50,63-75" val="1" />
+    </column>
+    <column type="0" name="K17" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="21" val="3" />
+     <heldSeq exposures="46-52" />
+     <elementSeq exposures="45,74-86" val="a" id="3" />
+     <elementSeq exposures="50-52,73-76,55" val="1" id="4" />
+    </column>
+    <column type="0" name="K18" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="35,29-31,12" val="a" />
+     <elementSeq exposures="56-56,x" val="3" />
+     <elementSeq exposures="40,23" val="b" id="4" />
+     <heldSeq exposures="x,11-23" />
+    </column>
+    <column type="0" name="K19" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="54-54,29,27" val="5" id="3" />
+     <elementSeq exposures="9-9" val="6" />
+     <elementSeq exposures="73-74" val="01" id="4" />
+     <elementSeq exposures="43-49,3" val="4" />
+     <elementSeq exposures="70-72" val="1" id="4" />
+    </column>
+    <column type="0" name="K20" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="62" val="b" />
+     <heldSeq exposures="67,57-63,40-42" />
+     <elementSeq exposures="1-" val="b" />
+     <elementSeq exposures="71,53-55" val="3" />
+     <heldSeq exposures="64,37-39" />
+    </column>
+    <column type="0" name="K21" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="3.5,18,45" val="a" />
+     <heldSeq exposures="28-29,21-27" />
+     <elementSeq exposures="33-45,20-21,50" val="a" id="4" />
+     <elementSeq exposures="14-26" val="2" />
+     <elementSeq exposures="56" val="4" id="4" />
+    </column>
+    <column type="0" name="K22" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="17,40,66-67" val="01" />
+     <elementSeq exposures="65,71-77,42" val="4" id="4" />
+     <elementSeq exposures="26," val="3" />
+     <elementSeq exposures="55,35" val="" />
+    </column>
+    <column type="0" name="K23" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="12-14,40,64" val="3" />
+     <elementSeq exposures="1,10" val="6" id="3" />
+     <elementSeq exposures="72-74,22-23,3-6" val="5" />
+     <elementSeq exposures="10,71-72" val="2" id="3" />
+    </column>
+    <column type="0" name="K24" displayOrder="0" width="100" anonymous="true" id="3">
+     <elementSeq exposures="23-29" val="2" id="3" />
+     <elementSeq exposures="2,42-43" val="1" id="3" />
+    </column>
+   </columns>
+  </scene>
+ </scenes>
+</project>

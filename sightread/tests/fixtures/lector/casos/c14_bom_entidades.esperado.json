@@ -1,0 +1,302 @@
+{
+ "caso": "c14_bom_entidades",
+ "version_formato": 1,
+ "descripcion": "BOM UTF-8 al inicio; nombres con & y no ASCII (escritos como &#NNN;) y atributo con < > \" &.",
+ "origen": "paridad",
+ "origen_por_bloque": {
+  "grafo": "regla",
+  "atributos": "regla",
+  "evaluacion": "paridad",
+  "medicion": "harmony"
+ },
+ "medicion": {
+  "estado": "medido",
+  "origen": "harmony",
+  "version_harmony": "24.0.2 build 23443",
+  "fecha": "2026-11-12",
+  "metodo": "medido en Harmony 24 (-batch) sobre una copia de una escena vacia creada por el usuario, a la que se le inserto el contenido del caso editando su XML; la firma de la escena del usuario se conserva sin tocar. Lectura: getMatrix por nodo y atributo DRAWING; render solo en los casos de apagado",
+  "metricas": [
+   4,
+   3,
+   24,
+   24,
+   12
+  ],
+  "K": [
+   0.1111111111111111,
+   0.08333333333333333,
+   0.2222222222222222
+  ],
+  "error_lectura": {
+   "matriz_campos_xy": 5.1e-06,
+   "z_campos": 6.866455078125e-05,
+   "nota": "xy: error de lectura de getMatrix en espacio de matriz; z cuantizada a 1/65536 en espacio de matriz"
+  },
+  "unidades": "matriz y z en campos: F = D^-1 M D con D = diag(KX,KY,KZ,1); matriz = [[a,b,tx],[c,d,ty]]",
+  "nodos": {
+   "Top/Pieza_A&B": {
+    "tipo": "PEG",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.0,
+      "dif_posicion_vs_canales": 0.0,
+      "dif_vs_esperado_z": 0.0
+     }
+    },
+    "nombre_en_harmony": "Top/Pieza_A_B"
+   },
+   "Top/Pieza_\u00d1and\u00fa": {
+    "tipo": "PEG",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.0,
+      "dif_vs_esperado_z": 0.0
+     }
+    }
+   }
+  },
+  "atributos_texto_en_harmony": {
+   "Top/Escritura": {
+    "scriptEditor": "si a < b & c > d entonces \"ok\" \u00e9\u00f1"
+   }
+  },
+  "atributos_texto_coinciden": true,
+  "reinterpretacion_al_guardar": {
+   "nodos_antes": 5,
+   "nodos_despues": 5,
+   "cables_antes": 3,
+   "cables_despues": 3,
+   "diferencias": [
+    "nodo ausente al guardar: Top/Pieza_A&B",
+    "nodo nuevo al guardar: Top/Pieza_A_B",
+    "cables distintos: solo antes [('Top', 'Pieza_A&B', 'Pieza_\u00d1and\u00fa', '0', '0')], solo despues [('Top', 'Pieza_A_B', 'Pieza_\u00d1and\u00fa', '0', '0')]"
+   ]
+  },
+  "discrepancias_con_regla_paridad": [],
+  "notas": [
+   "Harmony cambia '&' por '_' en el NOMBRE del nodo al abrir (Pieza_A&B pasa a Pieza_A_B; el cable sigue); no cambia las letras no ASCII (Pieza_\u00d1and\u00fa). Con BOM, entidades numericas y < > \" en un atributo abre y conserva el texto del atributo."
+  ]
+ },
+ "escena": {
+  "fotogramas": 24,
+  "fps": 24
+ },
+ "nodos": [
+  {
+   "ruta": "Top/Pieza_A&B",
+   "tipo": "PEG",
+   "nombre": "Pieza_A&B",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pieza_\u00d1and\u00fa",
+   "tipo": "PEG",
+   "nombre": "Pieza_\u00d1and\u00fa",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Escritura",
+   "tipo": "WRITE",
+   "nombre": "Escritura",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Composite",
+   "tipo": "COMPOSITE",
+   "nombre": "Composite",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pantalla",
+   "tipo": "DISPLAY",
+   "nombre": "Pantalla",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  }
+ ],
+ "cables_literales": [
+  [
+   "Top",
+   "Top/Pieza_A&B",
+   0,
+   "Top/Pieza_\u00d1and\u00fa",
+   0
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Pantalla",
+   0
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Escritura",
+   0
+  ]
+ ],
+ "fuentes": {
+  "Top/Pieza_\u00d1and\u00fa": {
+   "0": [
+    [
+     "Top/Pieza_A&B",
+     0
+    ]
+   ]
+  },
+  "Top/Escritura": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  },
+  "Top/Pantalla": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  }
+ },
+ "puertos_composite": {},
+ "atributos": {
+  "Top/Escritura": {
+   "scriptEditor": "si a < b & c > d entonces \"ok\" \u00e9\u00f1"
+  }
+ },
+ "evaluacion": {
+  "1": {
+   "Top/Pieza_A&B": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Pieza_A&B"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.0
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Pieza_\u00d1and\u00fa": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Pieza_\u00d1and\u00fa",
+     "Top/Pieza_A&B"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.0
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  }
+ }
+}

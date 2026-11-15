@@ -1,0 +1,443 @@
+{
+ "caso": "c04_grupo_multiport",
+ "version_formato": 1,
+ "descripcion": "Grupo_1 con Multi-Port-In y una salida MULTIPORT_OUT llamada no-name_1; el PEG de la raiz alimenta al PEG interior a traves del grupo.",
+ "origen": "paridad",
+ "origen_por_bloque": {
+  "grafo": "regla",
+  "atributos": "regla",
+  "evaluacion": "paridad",
+  "medicion": "harmony"
+ },
+ "medicion": {
+  "estado": "medido",
+  "origen": "harmony",
+  "version_harmony": "24.0.2 build 23443",
+  "fecha": "2026-11-12",
+  "metodo": "medido en Harmony 24 (-batch) sobre una copia de una escena vacia creada por el usuario, a la que se le inserto el contenido del caso editando su XML; la firma de la escena del usuario se conserva sin tocar. Lectura: getMatrix por nodo y atributo DRAWING; render solo en los casos de apagado",
+  "metricas": [
+   4,
+   3,
+   24,
+   24,
+   12
+  ],
+  "K": [
+   0.1111111111111111,
+   0.08333333333333333,
+   0.2222222222222222
+  ],
+  "error_lectura": {
+   "matriz_campos_xy": 5.1e-06,
+   "z_campos": 6.866455078125e-05,
+   "nota": "xy: error de lectura de getMatrix en espacio de matriz; z cuantizada a 1/65536 en espacio de matriz"
+  },
+  "unidades": "matriz y z en campos: F = D^-1 M D con D = diag(KX,KY,KZ,1); matriz = [[a,b,tx],[c,d,ty]]",
+  "nodos": {
+   "Top/Peg_Raiz": {
+    "tipo": "PEG",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        0.0,
+        -0.75,
+        0.0
+       ],
+       [
+        1.3333333,
+        0.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.3333333,
+      "dif_posicion_vs_canales": 0.0,
+      "dif_vs_esperado_z": 0.0
+     }
+    }
+   },
+   "Top/Grupo_1/Peg_G": {
+    "tipo": "PEG",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        0.0,
+        -0.75,
+        0.0
+       ],
+       [
+        2.6666667,
+        0.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.6666667,
+      "dif_vs_esperado_z": 0.0
+     }
+    }
+   },
+   "Top/Grupo_1/Dibujo_G": {
+    "tipo": "READ",
+    "fotogramas": {
+     "1": {
+      "matriz": [
+       [
+        0.0,
+        -0.75,
+        0.0
+       ],
+       [
+        2.6666667,
+        0.0,
+        0.0
+       ]
+      ],
+      "z": 0.0,
+      "dibujo_expuesto": "elements/Dibujo_G/Dibujo_G-1.tvg",
+      "error_vs_modelo_harmony": 0.0,
+      "apagado": false,
+      "apagado_efectivo": false,
+      "dif_vs_esperado_matriz": 0.6666667,
+      "dif_vs_esperado_z": 0.0,
+      "dibujo_esperado": "elements/Dibujo_G/Dibujo_G-1.tvg"
+     }
+    }
+   }
+  },
+  "reinterpretacion_al_guardar": {
+   "nodos_antes": 8,
+   "nodos_despues": 8,
+   "cables_antes": 6,
+   "cables_despues": 6,
+   "diferencias": []
+  },
+  "discrepancias_con_regla_paridad": [
+   "f1 Top/Peg_Raiz: matriz medida [[0.0, -0.75, 0.0], [1.3333333, 0.0, 0.0]] vs compatibilidad [[0.0, -1.0, 0.0], [1.0, 0.0, 0.0]] (dif 0.3333)",
+   "f1 Top/Grupo_1/Peg_G: matriz medida [[0.0, -0.75, 0.0], [2.6666667, 0.0, 0.0]] vs compatibilidad [[0.0, -1.0, 0.0], [2.0, 0.0, 0.0]] (dif 0.6667)",
+   "f1 Top/Grupo_1/Dibujo_G: matriz medida [[0.0, -0.75, 0.0], [2.6666667, 0.0, 0.0]] vs compatibilidad [[0.0, -1.0, 0.0], [2.0, 0.0, 0.0]] (dif 0.6667)"
+  ],
+  "notas": [
+   "La matriz de compatibilidad (isotropa, en campos) difiere de la medida donde hay rotacion: Harmony compone en espacio de matriz (A4-02) y F = D^-1 M D deja factores KY/KX = 0,75 y KX/KY = 1,333 (aspecto 4:3) en los terminos cruzados. Coinciden donde las rotaciones se cancelan o no hay.",
+   "Las matrices de los nodos de dentro del grupo (Top/Grupo_1/...) se miden igual que las de fuera: el grupo no cambia la cadena."
+  ]
+ },
+ "escena": {
+  "fotogramas": 24,
+  "fps": 24
+ },
+ "nodos": [
+  {
+   "ruta": "Top/Peg_Raiz",
+   "tipo": "PEG",
+   "nombre": "Peg_Raiz",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_1",
+   "tipo": "GROUP",
+   "nombre": "Grupo_1",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_1/no-name_1",
+   "tipo": "MULTIPORT_OUT",
+   "nombre": "no-name_1",
+   "padre": "Grupo_1",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_1/Multi-Port-In",
+   "tipo": "MULTIPORT_IN",
+   "nombre": "Multi-Port-In",
+   "padre": "Grupo_1",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_1/Peg_G",
+   "tipo": "PEG",
+   "nombre": "Peg_G",
+   "padre": "Grupo_1",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Grupo_1/Dibujo_G",
+   "tipo": "READ",
+   "nombre": "Dibujo_G",
+   "padre": "Grupo_1",
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Composite",
+   "tipo": "COMPOSITE",
+   "nombre": "Composite",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  },
+  {
+   "ruta": "Top/Pantalla",
+   "tipo": "DISPLAY",
+   "nombre": "Pantalla",
+   "padre": null,
+   "apagado": false,
+   "apagado_efectivo": false
+  }
+ ],
+ "cables_literales": [
+  [
+   "Top/Grupo_1",
+   "Top/Grupo_1/Multi-Port-In",
+   0,
+   "Top/Grupo_1/Peg_G",
+   0
+  ],
+  [
+   "Top/Grupo_1",
+   "Top/Grupo_1/Peg_G",
+   0,
+   "Top/Grupo_1/Dibujo_G",
+   0
+  ],
+  [
+   "Top/Grupo_1",
+   "Top/Grupo_1/Dibujo_G",
+   0,
+   "Top/Grupo_1/no-name_1",
+   0
+  ],
+  [
+   "Top",
+   "Top/Peg_Raiz",
+   0,
+   "Top/Grupo_1",
+   0
+  ],
+  [
+   "Top",
+   "Top/Grupo_1",
+   0,
+   "Top/Composite",
+   0
+  ],
+  [
+   "Top",
+   "Top/Composite",
+   0,
+   "Top/Pantalla",
+   0
+  ]
+ ],
+ "fuentes": {
+  "Top/Grupo_1": {
+   "0": [
+    [
+     "Top/Peg_Raiz",
+     0
+    ]
+   ]
+  },
+  "Top/Grupo_1/no-name_1": {
+   "0": [
+    [
+     "Top/Grupo_1/Dibujo_G",
+     0
+    ]
+   ]
+  },
+  "Top/Grupo_1/Peg_G": {
+   "0": [
+    [
+     "Top/Peg_Raiz",
+     0
+    ]
+   ]
+  },
+  "Top/Grupo_1/Dibujo_G": {
+   "0": [
+    [
+     "Top/Grupo_1/Peg_G",
+     0
+    ]
+   ]
+  },
+  "Top/Composite": {
+   "0": [
+    [
+     "Top/Grupo_1/Dibujo_G",
+     0
+    ]
+   ]
+  },
+  "Top/Pantalla": {
+   "0": [
+    [
+     "Top/Composite",
+     0
+    ]
+   ]
+  }
+ },
+ "puertos_composite": {
+  "Top/Composite": [
+   0
+  ]
+ },
+ "atributos": {},
+ "evaluacion": {
+  "1": {
+   "Top/Peg_Raiz": {
+    "tipo": "PEG",
+    "padre": null,
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Peg_Raiz"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 90.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.0
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Grupo_1/Peg_G": {
+    "tipo": "PEG",
+    "padre": "Grupo_1",
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Grupo_1/Peg_G",
+     "Top/Peg_Raiz"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 2.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "posicion.x": 0.0,
+     "posicion.y": 0.0,
+     "posicion.z": 0.0
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   },
+   "Top/Grupo_1/Dibujo_G": {
+    "tipo": "READ",
+    "padre": "Grupo_1",
+    "apagado": false,
+    "apagado_efectivo": false,
+    "cadena": [
+     "Top/Grupo_1/Peg_G",
+     "Top/Peg_Raiz"
+    ],
+    "cortada": false,
+    "canales": {
+     "escala.x": 1.0,
+     "escala.y": 1.0,
+     "rotacion": 0.0,
+     "sesgo": 0.0,
+     "pivote.x": 0.0,
+     "pivote.y": 0.0,
+     "offset.x": 0.0,
+     "offset.y": 0.0,
+     "offset.z": 0.0
+    },
+    "dibujo": {
+     "elemento_id": 2,
+     "elemento": "Dibujo_G",
+     "carpeta": "Dibujo_G",
+     "dibujo": "1",
+     "ruta_relativa": "elements/Dibujo_G/Dibujo_G-1.tvg"
+    },
+    "z": 0.0,
+    "matriz": [
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "origen": {
+     "apagado": "regla",
+     "apagado_efectivo": "paridad",
+     "cadena": "paridad",
+     "canales": "regla",
+     "dibujo": "regla",
+     "z": "paridad",
+     "matriz": "paridad"
+    }
+   }
+  }
+ }
+}

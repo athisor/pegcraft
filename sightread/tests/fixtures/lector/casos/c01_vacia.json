@@ -1,0 +1,17 @@
+{
+ "nombre": "c01_vacia",
+ "descripcion": "Escena vacia: READ sin dibujo, COMPOSITE, WRITE, DISPLAY; sin PEG.",
+ "fotogramas": 24,
+ "evaluar": [1],
+ "nodos": [
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"},
+  {"tipo": "WRITE", "nombre": "Escritura"},
+  {"tipo": "READ", "nombre": "Dibujo_A"}
+ ],
+ "enlaces": [
+  {"origen": "Composite", "destino": "Pantalla"},
+  {"origen": "Composite", "destino": "Escritura"},
+  {"origen": "Dibujo_A", "destino": "Composite"}
+ ]
+}

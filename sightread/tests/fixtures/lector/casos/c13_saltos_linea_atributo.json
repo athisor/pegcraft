@@ -1,0 +1,21 @@
+{
+ "nombre": "c13_saltos_linea_atributo",
+ "descripcion": "Saltos de linea dentro de un atributo: uno crudo (como Harmony escribe scriptEditor) y otro como &#10;.",
+ "fotogramas": 24,
+ "evaluar": [1],
+ "atributos_texto": [
+  {"nodo": "Escritura_1", "ruta": ["scriptEditor"]},
+  {"nodo": "Escritura_2", "ruta": ["scriptEditor"]}
+ ],
+ "nodos": [
+  {"tipo": "WRITE", "nombre": "Escritura_1", "attrs": {"scriptEditor": {"val": "linea uno\nlinea dos\n\nlinea cuatro"}}},
+  {"tipo": "WRITE", "nombre": "Escritura_2", "attrs": {"scriptEditor": {"val": "alfa\nbeta\r\ngamma", "salto": "entidad"}}},
+  {"tipo": "COMPOSITE", "nombre": "Composite"},
+  {"tipo": "DISPLAY", "nombre": "Pantalla"}
+ ],
+ "enlaces": [
+  {"origen": "Composite", "destino": "Pantalla"},
+  {"origen": "Composite", "destino": "Escritura_1"},
+  {"origen": "Composite", "destino": "Escritura_2"}
+ ]
+}
